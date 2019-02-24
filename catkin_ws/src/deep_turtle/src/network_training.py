@@ -4,6 +4,7 @@ import pathlib
 import matplotlib.pyplot as plt
 
 import tensorflow as tf
+from tensorflow.keras import layers
 
 tf.enable_eager_execution()
 
@@ -34,12 +35,32 @@ def get_dataset(root):
     return tf.data.Dataset.from_tensor_slices((rgb_tensors, depth_tensors, command_tensors))
 
 ## Network Model ##
+def get_model():
+    model = tf.keras.Sequential()
+    # Normalization layers
+
+    # Strided 5x5 Convolutions
+    for i in range(3):
+        model.add(layers.Conv2D(filters=64, kernel_size=5, strides=2, activation='relu'))
+
+    # Non-strided 3x3 Convolutions
+    for i in range(2):
+        model.add(layers.Conv2D(filters=64, kernel_size=3, activation='relu'))
+
+    # Fully-connected layers
+    model.add(layers.Flatten())
+    model.add(layers.Dense(64, activation='relu'))
+    model.add(layers.Dense(32, activation='relu'))
+    model.add(layers.Dense(1))
+
+    return model
 
 if __name__=='__main__':
     test_name = 'rgbd'
     ws_root = os.getcwd().split('catkin_ws')[0]
     data_root = os.path.join(ws_root, 'data', test_name)
-
     dataset = get_dataset(data_root)
+    model = get_model()
+
     for i,x in enumerate(dataset.take(1)):
         rgb, depth, (v, omega) = x
