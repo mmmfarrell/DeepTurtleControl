@@ -1,3 +1,4 @@
+from IPython.core.debugger import set_trace
 import os
 import json
 import pathlib
@@ -24,7 +25,7 @@ def load_and_preprocess_command(path):
     command = json.load(open(path))
     return [command['v'], command['omega']]
 
-def get_dataset(root):
+def get_dataset(root, batch_size=5, shuffle=True):
     paths = [os.path.join(root, filename) for filename in os.listdir(root)]
     paths.sort()
 
@@ -32,35 +33,58 @@ def get_dataset(root):
     rgb_tensors = [load_and_preprocess_image(x) for x in paths[2::3]]
     depth_tensors = [load_and_preprocess_image(x) for x in paths[1::3]]
     command_tensors = [load_and_preprocess_command(x) for x in paths[0::3]]
-    return tf.data.Dataset.from_tensor_slices((rgb_tensors, depth_tensors, command_tensors))
+    ds = tf.data.Dataset.from_tensor_slices((rgb_tensors, depth_tensors, command_tensors))
+    set_trace()
+    # TODO: Add shuffle
+    return ds.batch(batch_size)
 
 ## Network Model ##
-def get_model():
+def get_model(outputs=1):
     model = tf.keras.Sequential()
-    # Normalization layers
 
     # Strided 5x5 Convolutions
-    for i in range(3):
-        model.add(layers.Conv2D(filters=64, kernel_size=5, strides=2, activation='relu'))
+    for output_channels in [24,36,48]:
+        model.add(layers.Conv2D(filters=output_channels, kernel_size=5, strides=2, activation='relu'))
 
     # Non-strided 3x3 Convolutions
-    for i in range(2):
-        model.add(layers.Conv2D(filters=64, kernel_size=3, activation='relu'))
+    for output_channels in [64,64]:
+        model.add(layers.Conv2D(filters=output_channels, kernel_size=3, activation='relu'))
 
     # Fully-connected layers
     model.add(layers.Flatten())
-    model.add(layers.Dense(64, activation='relu'))
-    model.add(layers.Dense(32, activation='relu'))
-    model.add(layers.Dense(1))
+    model.add(layers.Dense(100, activation='relu'))
+    model.add(layers.Dense(50, activation='relu'))
+    model.add(layers.Dense(outputs))
 
     return model
 
 if __name__=='__main__':
+    # Dataset
     test_name = 'rgbd'
     ws_root = os.getcwd().split('catkin_ws')[0]
     data_root = os.path.join(ws_root, 'data', test_name)
     dataset = get_dataset(data_root)
-    model = get_model()
 
-    for i,x in enumerate(dataset.take(1)):
-        rgb, depth, (v, omega) = x
+    # Model
+    num_outputs = 1
+    model = get_model(num_outputs)
+
+    # Training params
+    loss_function = tf.keras.losses.MSE
+    num_epochs = 1
+
+    for epoch in range(num_epochs):
+        for i,x in enumerate(dataset):
+            rgb, depth, command = x
+
+            # Concatenate rgb and depth
+            rgbd = tf.concat([rgb, depth], 2)
+            print(rgbd.shape)
+
+            # Estimate command
+            command_pred = model(rgbd)
+
+            # Compute Loss
+            loss = loss_function(command, command_pred)
+
+            # Update model
