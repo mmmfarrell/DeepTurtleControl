@@ -1,5 +1,8 @@
 <launch>
 
+  <!--Launch Turtlebot-->
+  <include file="$(find turtlebot_bringup)/launch/minimal.launch"/>
+
   <!--Launch Realsense Camera-->
   <include file="$(find realsense2_camera)/launch/rs_rgbd.launch"/>
 
@@ -11,7 +14,7 @@
     <param name="joy_velocity_max" value="1."/>
     <param name="joy_omega_max" value="1."/>
     <param name="constant_vel" value="1."/>
-    <remap from="turtle_cmd" to="turtle_cmd"/>
+    <remap from="turtle_cmd" to="/mobile_base/commands/velocity"/>
   </node>
 
   <!--Data Recorder-->
@@ -20,7 +23,7 @@
     <remap from="record_data" to="/record_data"/>
     <remap from="rgb_image" to="/camera/color/image_raw"/>
     <remap from="depth_image" to="/camera/depth/image_rect_raw"/>
-    <remap from="turtlebot_command" to="/turtle_cmd"/>
+    <remap from="turtlebot_command" to="/mobile_base/commands/velocity"/>
   </node>
 
 </launch>

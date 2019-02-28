@@ -5,7 +5,7 @@ import numpy as np
 import rospy
 import cv2
 
-from geometry_msgs.msg import TwistStamped
+from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Joy
 from std_msgs.msg import Bool
 
@@ -18,8 +18,8 @@ class TurtleControl():
         # B - constant vel, omega joy command
         # Y - autonomous command
         self.cmd_type = 0
-        self.cmd_msg = TwistStamped()
-        self.auto_cmd = TwistStamped()
+        self.cmd_msg = Twist()
+        self.auto_cmd = Twist()
         self.joy_vel = 0.
         self.joy_omega = 0.
 
@@ -32,10 +32,10 @@ class TurtleControl():
 
         self._joy_sub = rospy.Subscriber("joy", Joy,
                 self.joy_callback)
-        self._auto_cmd_sub = rospy.Subscriber("auto_cmd", TwistStamped,
+        self._auto_cmd_sub = rospy.Subscriber("auto_cmd", Twist,
                 self.auto_cmd_callback)
 
-        self._cmd_pub = rospy.Publisher('turtle_cmd', TwistStamped,
+        self._cmd_pub = rospy.Publisher('turtle_cmd', Twist,
                 queue_size=10)
         self._record_pub = rospy.Publisher('record_data', Bool,
                 queue_size=10)
@@ -45,16 +45,16 @@ class TurtleControl():
         rospy.spin()
 
     def timer_callback(self, event):
-        self.cmd_msg.header.stamp = rospy.Time.now()
+        # self.cmd_msg.header.stamp = rospy.Time.now()
         if self.cmd_type == 0: # pure joy command
-            self.cmd_msg.twist.linear.x = self.joy_vel
-            self.cmd_msg.twist.angular.z = self.joy_omega
+            self.cmd_msg.linear.x = self.joy_vel
+            self.cmd_msg.angular.z = self.joy_omega
         elif self.cmd_type == 1: # omega only command
-            self.cmd_msg.twist.linear.x = self.constant_vel
-            self.cmd_msg.twist.angular.z = self.joy_omega
+            self.cmd_msg.linear.x = self.constant_vel
+            self.cmd_msg.angular.z = self.joy_omega
         elif self.cmd_type == 2: # auto command
-            self.cmd_msg.twist.linear.x = self.auto_cmd.twist.linear.x
-            self.cmd_msg.twist.angular.z = self.auto_cmd.twist.angular.z
+            self.cmd_msg.linear.x = self.auto_cmd.linear.x
+            self.cmd_msg.angular.z = self.auto_cmd.angular.z
         self._cmd_pub.publish(self.cmd_msg)
 
     def publish_record(self):

@@ -11,7 +11,7 @@ import json
 import message_filters
 
 from sensor_msgs.msg import Image
-from geometry_msgs.msg import TwistStamped
+from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool
 
 from cv_bridge import CvBridge, CvBridgeError
@@ -37,10 +37,10 @@ class DataRecorder():
 
         rgb_sub = message_filters.Subscriber('rgb_image', Image)
         depth_sub = message_filters.Subscriber('depth_image', Image)
-        cmd_sub = message_filters.Subscriber('turtlebot_command', TwistStamped)
+        cmd_sub = message_filters.Subscriber('turtlebot_command', Twist)
 
         ts = message_filters.ApproximateTimeSynchronizer([rgb_sub, depth_sub,
-            cmd_sub], 10, 1.1)
+            cmd_sub], 10, 0.1, allow_headerless=True)
         ts.registerCallback(self.combined_callback)
 
         rospy.spin()
@@ -54,8 +54,8 @@ class DataRecorder():
         # Write Commands as Json
         json_file_name = self.record_dir + "/" + index_string + "_commands.json"
         json_data = {}
-        json_data['v'] = cmd_msg.twist.linear.x
-        json_data['omega'] = cmd_msg.twist.angular.z
+        json_data['v'] = cmd_msg.linear.x
+        json_data['omega'] = cmd_msg.angular.z
         with open(json_file_name, 'w') as json_file:  
             json.dump(json_data, json_file)
 
