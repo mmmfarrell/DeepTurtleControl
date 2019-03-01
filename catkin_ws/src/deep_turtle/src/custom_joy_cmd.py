@@ -68,7 +68,7 @@ class TurtleControl():
         self.joy_omega = msg.axes[0] # from -1 to 1
 
         self.joy_vel = self.velocity_max * self.joy_vel
-        self.joy_omega = self.velocity_max * self.joy_omega
+        self.joy_omega = self.omega_max * self.joy_omega
 
         if msg.buttons[0]: # A Button
             self.cmd_type = 0 # pure joy command
