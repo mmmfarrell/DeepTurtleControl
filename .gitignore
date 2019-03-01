@@ -1,3 +1,5 @@
 catkin_ws/build/
 catkin_ws/devel/
 catkin_ws/src/deep_turtle/data/
+data/*/*.jpg
+data/*/*.json
