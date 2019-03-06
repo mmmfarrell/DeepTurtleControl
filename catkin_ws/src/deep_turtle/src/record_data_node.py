@@ -37,9 +37,10 @@ class DataRecorder():
         else:
             print("Found directory: {}".format(self.record_dir))
             files = sorted(os.listdir(self.record_dir))
-            last_file = files[-1]
-            self.current_record_idx = int(last_file[0:6]) + 1
-            print("Starting recording at # {}".format(self.current_record_idx))
+            if (len(files)):
+              last_file = files[-1]
+              self.current_record_idx = int(last_file[0:6]) + 1
+              print("Starting recording at # {}".format(self.current_record_idx))
 
         self._record_sub = rospy.Subscriber("record_data", Bool,
                 self.record_callback)
