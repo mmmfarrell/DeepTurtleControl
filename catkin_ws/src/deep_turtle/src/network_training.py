@@ -5,7 +5,7 @@ import pathlib
 import matplotlib.pyplot as plt
 
 import tensorflow as tf
-from tensorflow.keras import layers
+from tensorflow.keras.layers import Dense, Conv2D, Dropout, Flatten
 
 tf.enable_eager_execution()
 
@@ -20,9 +20,20 @@ def load_and_preprocess_image(path, channels):
     image = tf.read_file(path)
     return preprocess_image(image, channels)
 
-def load_and_preprocess_command(path, outputs):
+def load_and_preprocess_command(path, outputs, omega_bins=15):
     command = json.load(open(path))
-    return [command[key] for key in outputs]
+    result = []
+    # Binning params
+    for key in outputs:
+        if key == 'omega':
+            # Get one-hot encoding of omega bin
+            omega = command[key]
+            bin_size = 2.0/omega_bins
+            bin_idx = int((omega+1)/bin_size)
+            result.append([float(i == bin_idx) for i in range(omega_bins)])
+        else:
+            result.append(command[key])
+    return result
 
 def get_dataset(root, input_type='rgbd', outputs=['omega']):
     paths = [os.path.join(root, filename) for filename in os.listdir(root)
@@ -44,25 +55,37 @@ def get_dataset(root, input_type='rgbd', outputs=['omega']):
     return tf.data.Dataset.from_tensor_slices((input_tensors, command_tensors))
 
 ## Network Model ##
-def get_model(output_size=1):
-    model = tf.keras.Sequential()
+class DonkeyCarNet(tf.keras.Model):
+    def __init__(self, output_size=1, omega_bins=15):
+        super().__init__()
+        self.output_size = output_size
+        self.conv_layers = tf.keras.Sequential((
+            Conv2D(24, (5,5), strides=2, activation='relu'),
+            Conv2D(32, (5,5), strides=2, activation='relu'),
+            Conv2D(64, (5,5), strides=2, activation='relu'),
+            Conv2D(64, (3,3), strides=2, activation='relu'),
+            Conv2D(64, (3,3), strides=1, activation='relu')
+        ))
+        self.linear_layers = tf.keras.Sequential((
+            Flatten(),
+            Dense(100, activation='relu'),
+            Dropout(0.1),
+            Dense(50, activation='relu'),
+            Dropout(0.1)
+        ))
+        self.omega_out_layer = Dense(omega_bins, activation='softmax', name='omega_out')
+        if self.output_size == 2:
+            self.vel_out_layer = Dense(1, activation='relu', name='vel_out')
 
-    # Strided 5x5 Convolutions
-    for output_channels in [24,36,48]:
-        model.add(layers.Conv2D(filters=output_channels,
-            kernel_size=5, strides=2, activation='relu'))
-
-    # Non-strided 3x3 Convolutions
-    for output_channels in [64,64]:
-        model.add(layers.Conv2D(filters=output_channels, kernel_size=3, activation='relu'))
-
-    # Fully-connected layers
-    model.add(layers.Flatten())
-    model.add(layers.Dense(100, activation='relu'))
-    model.add(layers.Dense(50, activation='relu'))
-    model.add(layers.Dense(output_size))
-
-    return model
+    def call(self, inputs):
+        x = self.conv_layers(inputs)
+        x = self.linear_layers(x)
+        omega_out = self.omega_out_layer(x)
+        if self.output_size == 2:
+            vel_out = self.vel_out_layer(x)
+            return [omega_out, vel_out]
+        else:
+            return [omega_out]
 
 if __name__=='__main__':
     # Model loading params
@@ -70,33 +93,50 @@ if __name__=='__main__':
     model_name = 'model'
 
     # Dataset
-    test_name = 'test1'
+    test_name = 'blue_tape_lanes_vel_0_4'
     ws_root = os.getcwd().split('catkin_ws')[0]
     data_root = os.path.join(ws_root, 'data', test_name)
     outputs = ['omega']
-    dataset = get_dataset(data_root, input_type='rgbd', outputs=outputs)
+    dataset = get_dataset(data_root, input_type='rgb', outputs=outputs)
 
     # Model
-    model = get_model(output_size=len(outputs))
+    model = DonkeyCarNet(len(outputs))
     model_file = os.path.join(data_root, model_name)
     if load_model and os.path.isfile(model_file + ".index"):
         model.load_weights(model_file)
         print("Loading model weights from ", model_file)
+    optimizer = tf.train.AdamOptimizer(
+        learning_rate = 0.001,
+        beta1 = 0.9,
+        beta2 = 0.99,
+        epsilon = 1e-6
+    )
+    loss_function = 'categorical_crossentropy'
     model.compile(
-        optimizer=tf.train.AdamOptimizer(),
-        loss='mean_squared_error'
+        optimizer=optimizer,
+        loss=loss_function,
+        metrics=['accuracy']
     )
 
+    # for data in dataset.take(1):
+    #     inputs, outputs = data
+    #     set_trace()
+    #     y = model(inputs)
+
     # Training params
-    batch_size = 3
-    epochs = 30
+    batch_size = 10
+    epochs = 50
+    datapoints_per_epoch = 1
     # Fit the data
-    history = model.fit(dataset.batch(batch_size).repeat(epochs),
-              epochs=epochs, steps_per_epoch=len(list(dataset))//batch_size)
+    history = model.fit(dataset.repeat(epochs).batch(batch_size),
+              epochs=epochs*datapoints_per_epoch,
+              steps_per_epoch=len(list(dataset))//(batch_size*datapoints_per_epoch),
+              )
+
+
+    model.save_weights(model_file)
+    print("Saving model weights to ", model_file)
 
     losses = history.history['loss']
     plt.plot(losses)
     plt.show()
-
-    model.save_weights(model_file)
-    print("Saving model weights to ", model_file)
