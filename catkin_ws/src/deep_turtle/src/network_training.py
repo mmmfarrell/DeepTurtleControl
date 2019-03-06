@@ -35,9 +35,11 @@ def load_and_preprocess_command(path, outputs, omega_bins=15):
             result.append(command[key])
     return result
 
-def get_dataset(root, input_type='rgbd', outputs=['omega']):
-    paths = [os.path.join(root, filename) for filename in os.listdir(root)
-                if filename.endswith(('jpg', 'json'))]
+def get_dataset(roots, input_type='rgbd', outputs=['omega']):
+    paths = []
+    for root in roots:
+        paths.extend([os.path.join(root, filename) for filename in os.listdir(root)
+                    if filename.endswith(('jpg', 'json'))])
     paths.sort()
 
     # Separate data into groups
@@ -88,20 +90,18 @@ class DonkeyCarNet(tf.keras.Model):
             return [omega_out]
 
 if __name__=='__main__':
-    # Model loading params
-    load_model = False
-    model_name = 'model'
-
     # Dataset
-    test_name = 'blue_tape_lanes_vel_0_4'
+    test_folders = ['blue_tape_lanes_vel_0_4']
     ws_root = os.getcwd().split('catkin_ws')[0]
-    data_root = os.path.join(ws_root, 'data', test_name)
+    data_roots = [os.path.join(ws_root, 'data', test_name) for test_name in test_folders]
     outputs = ['omega']
-    dataset = get_dataset(data_root, input_type='rgb', outputs=outputs)
+    dataset = get_dataset(data_roots, input_type='rgb', outputs=outputs)
 
     # Model
+    load_model = False
+    model_name = '&'.join(test_folders) + '_model'
     model = DonkeyCarNet(len(outputs))
-    model_file = os.path.join(data_root, model_name)
+    model_file = os.path.join(data_roots[0], model_name)
     if load_model and os.path.isfile(model_file + ".index"):
         model.load_weights(model_file)
         print("Loading model weights from ", model_file)
