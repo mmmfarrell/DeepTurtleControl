@@ -26,6 +26,9 @@ class DataRecorder():
 
         self.test_name = rospy.get_param("~test_name")
 
+        self.frame_counter = 0
+        self.record_n_frames = rospy.get_param("~record_n_frames")
+
         rospack = rospkg.RosPack()
         self.package_path = rospack.get_path("deep_turtle")
         self.record_dir = self.package_path + "/data/" + self.test_name
@@ -55,7 +58,13 @@ class DataRecorder():
         if not self.record:
             return
 
-        index_string = str(self.current_record_idx).zfill(6)
+        if (self.frame_counter % self.record_n_frames) == 0:
+            self.frame_counter += 1
+        else:
+            self.frame_counter += 1
+            return
+
+        index_string = str(self.current_record_idx).zfill(5)
 
         # Write Commands as Json
         json_file_name = self.record_dir + "/" + index_string + "_commands.json"

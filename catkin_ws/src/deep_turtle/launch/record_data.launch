@@ -19,7 +19,9 @@
 
   <!--Data Recorder-->
   <node pkg="deep_turtle" type="record_data_node.py" name="data_recorder" output="screen">
-    <param name="test_name" value="blue_tape_lanes_vel_0_4"/>
+    <param name="test_name" value="constant_vel_0_25"/>
+    <!--Record Every Nth frame-->
+    <param name="record_n_frames" value="10"/>
     <remap from="record_data" to="/record_data"/>
     <remap from="rgb_image" to="/camera/color/image_raw"/>
     <remap from="depth_image" to="/camera/depth/image_rect_raw"/>
