@@ -35,7 +35,7 @@ class DataRecorder():
             print("Found directory: {}".format(self.record_dir))
             files = sorted(os.listdir(self.record_dir))
             last_file = files[-1]
-            self.current_record_idx = int(last_file[0:5]) + 1
+            self.current_record_idx = int(last_file[0:6]) + 1
             print("Starting recording at # {}".format(self.current_record_idx))
 
         self._record_sub = rospy.Subscriber("record_data", Bool,
@@ -55,7 +55,7 @@ class DataRecorder():
         if not self.record:
             return
 
-        index_string = str(self.current_record_idx).zfill(5)
+        index_string = str(self.current_record_idx).zfill(6)
 
         # Write Commands as Json
         json_file_name = self.record_dir + "/" + index_string + "_commands.json"
