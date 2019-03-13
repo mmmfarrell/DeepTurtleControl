@@ -10,8 +10,8 @@ from tensorflow.keras.layers import Dense, Conv2D, Dropout, Flatten
 tf.enable_eager_execution()
 
 ## Data Import Functions ##
-def load_and_preprocess_image(path, channels, size=[192,192], crop_box=[280, 0, 192, 640],
-                    augment_N=10, random_crop_margin=[30,30], flip=None):
+def load_and_preprocess_image(path, channels, size=[92,92], crop_box=[0, 0, 480, 640],
+                    augment_N=10, random_crop_margin=[0, 0], flip=None):
     image = tf.read_file(path)
     image = tf.image.decode_image(image, channels=channels)
     image = tf.image.crop_to_bounding_box(image, *crop_box)
@@ -47,7 +47,7 @@ def load_and_preprocess_command(path, outputs, omega_bins=15, augment_N=10, flip
         results.append(result)
     return results
 
-def get_dataset(roots, input_type='rgbd', outputs=['omega'], augment_N=10):
+def get_dataset(roots, input_type='rgbd', outputs=['omega'], augment_N=5):
     paths = []
     for root in roots:
         paths.extend([os.path.join(root, filename) for filename in os.listdir(root)
@@ -58,23 +58,24 @@ def get_dataset(roots, input_type='rgbd', outputs=['omega'], augment_N=10):
     rgb_tensors = []
     depth_tensors = []
     command_tensors = []
-    for i in range(0, len(paths), 3):
-        print('Creating dataset: {:.1f}%'.format(i*100/len(paths)), end='\r')
-        rgb_path = paths[i+2]
-        depth_path = paths[i+1]
-        command_path = paths[i]
-        random_flip = np.random.randint(0, 2, augment_N)
-        rgb_tensors.extend(load_and_preprocess_image(rgb_path, channels=3, augment_N=augment_N, flip=random_flip))
-        depth_tensors.extend(load_and_preprocess_image(depth_path, channels=1, augment_N=augment_N, flip=random_flip))
-        command_tensors.extend(load_and_preprocess_command(command_path, outputs=outputs, augment_N=augment_N, flip=random_flip))
-    if input_type == 'rgbd':
-        input_tensors = tf.concat((rgb_tensors, depth_tensors), axis=3)
-    elif input_type == 'rgb':
-        input_tensors = rgb_tensors
-    elif input_type == 'depth':
-        input_tensors = depth_tensors
-    else:
-        raise ValueError('Invalid input type: \'', input_type, '\'')
+    with tf.device("/cpu:0"):
+        for i in range(0, len(paths), 3):
+            print('Creating dataset: {:.1f}%'.format(i*100/len(paths)), end='\r')
+            rgb_path = paths[i+2]
+            depth_path = paths[i+1]
+            command_path = paths[i]
+            random_flip = np.random.randint(0, 2, augment_N)
+            rgb_tensors.extend(load_and_preprocess_image(rgb_path, channels=3, augment_N=augment_N, flip=random_flip))
+            depth_tensors.extend(load_and_preprocess_image(depth_path, channels=1, augment_N=augment_N, flip=random_flip))
+            command_tensors.extend(load_and_preprocess_command(command_path, outputs=outputs, augment_N=augment_N, flip=random_flip))
+        if input_type == 'rgbd':
+            input_tensors = tf.concat((rgb_tensors, depth_tensors), axis=3)
+        elif input_type == 'rgb':
+            input_tensors = rgb_tensors
+        elif input_type == 'depth':
+            input_tensors = depth_tensors
+        else:
+            raise ValueError('Invalid input type: \'', input_type, '\'')
     return tf.data.Dataset.from_tensor_slices((input_tensors, command_tensors))
 
 ## Network Model ##
@@ -112,14 +113,15 @@ class DonkeyCarNet(tf.keras.Model):
 
 if __name__=='__main__':
     # Dataset
-    test_folders = ['blue_tape_lanes_vel_0_4']
+    test_folders = ['rope_circle_0_3_vel']
     ws_root = os.getcwd().split('catkin_ws')[0]
     data_roots = [os.path.join(ws_root, 'data', test_name) for test_name in test_folders]
     outputs = ['omega']
-    dataset = get_dataset(data_roots, input_type='rgb', outputs=outputs)
+    with tf.device("/cpu:0"):
+        dataset = get_dataset(data_roots, input_type='rgb', outputs=outputs)
 
     # Model
-    load_model = False
+    load_model = True
     model_name = '&'.join(test_folders) + '_model'
     model = DonkeyCarNet(len(outputs))
     model_file = os.path.join(data_roots[0], model_name)
