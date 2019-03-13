@@ -1,7 +1,7 @@
 from IPython.core.debugger import set_trace
 import os
 import json
-import pathlib
+import numpy as np
 import matplotlib.pyplot as plt
 
 import tensorflow as tf
@@ -10,32 +10,44 @@ from tensorflow.keras.layers import Dense, Conv2D, Dropout, Flatten
 tf.enable_eager_execution()
 
 ## Data Import Functions ##
-def preprocess_image(image, channels=3, size=[192,192]):
+def load_and_preprocess_image(path, channels, size=[192,192], crop_box=[280, 0, 192, 640],
+                    augment_N=10, random_crop_margin=[30,30], flip=None):
+    image = tf.read_file(path)
     image = tf.image.decode_image(image, channels=channels)
+    image = tf.image.crop_to_bounding_box(image, *crop_box)
     image = tf.image.resize_images(image, size)
     image /= 255.0  # normalize to [0,1] range
-    return image
 
-def load_and_preprocess_image(path, channels):
-    image = tf.read_file(path)
-    return preprocess_image(image, channels)
+    # Create augmentations
+    images = []
+    random_crop_box = [size[i] - random_crop_margin[i] for i in range(2)] + [channels]
+    for i in range(augment_N):
+        augment_img = image
+        augment_img = tf.image.random_crop(augment_img, random_crop_box)
+        if flip is not None and flip[i] == 1:
+            augment_img = tf.image.flip_left_right(augment_img)
+        images.append(augment_img)
+    return images
 
-def load_and_preprocess_command(path, outputs, omega_bins=15):
+def load_and_preprocess_command(path, outputs, omega_bins=15, augment_N=10, flip=None):
+    bin_size = 2.0/omega_bins
     command = json.load(open(path))
-    result = []
-    # Binning params
-    for key in outputs:
-        if key == 'omega':
-            # Get one-hot encoding of omega bin
-            omega = command[key]
-            bin_size = 2.0/omega_bins
-            bin_idx = int((omega+1)/bin_size)
-            result.append([float(i == bin_idx) for i in range(omega_bins)])
-        else:
-            result.append(command[key])
-    return result
+    results = []
+    for i in range(augment_N):
+        result = []
+        # Binning params
+        for key in outputs:
+            if key == 'omega':
+                # Get one-hot encoding of omega bin
+                omega = command[key] * flip[i]*-1 # Negate omega for flipped images
+                bin_idx = int((omega+1)/bin_size)
+                result.append([float(i == bin_idx) for i in range(omega_bins)])
+            else:
+                result.append(command[key])
+        results.append(result)
+    return results
 
-def get_dataset(roots, input_type='rgbd', outputs=['omega']):
+def get_dataset(roots, input_type='rgbd', outputs=['omega'], augment_N=10):
     paths = []
     for root in roots:
         paths.extend([os.path.join(root, filename) for filename in os.listdir(root)
@@ -43,8 +55,18 @@ def get_dataset(roots, input_type='rgbd', outputs=['omega']):
     paths.sort()
 
     # Separate data into groups
-    rgb_tensors = [load_and_preprocess_image(x, channels=3) for x in paths[2::3]]
-    depth_tensors = [load_and_preprocess_image(x, channels=1) for x in paths[1::3]]
+    rgb_tensors = []
+    depth_tensors = []
+    command_tensors = []
+    for i in range(0, len(paths), 3):
+        print('Creating dataset: {:.1f}%'.format(i*100/len(paths)), end='\r')
+        rgb_path = paths[i+2]
+        depth_path = paths[i+1]
+        command_path = paths[i]
+        random_flip = np.random.randint(0, 2, augment_N)
+        rgb_tensors.extend(load_and_preprocess_image(rgb_path, channels=3, augment_N=augment_N, flip=random_flip))
+        depth_tensors.extend(load_and_preprocess_image(depth_path, channels=1, augment_N=augment_N, flip=random_flip))
+        command_tensors.extend(load_and_preprocess_command(command_path, outputs=outputs, augment_N=augment_N, flip=random_flip))
     if input_type == 'rgbd':
         input_tensors = tf.concat((rgb_tensors, depth_tensors), axis=3)
     elif input_type == 'rgb':
@@ -53,7 +75,6 @@ def get_dataset(roots, input_type='rgbd', outputs=['omega']):
         input_tensors = depth_tensors
     else:
         raise ValueError('Invalid input type: \'', input_type, '\'')
-    command_tensors = [load_and_preprocess_command(x, outputs) for x in paths[0::3]]
     return tf.data.Dataset.from_tensor_slices((input_tensors, command_tensors))
 
 ## Network Model ##
