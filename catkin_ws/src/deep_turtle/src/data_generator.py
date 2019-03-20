@@ -6,6 +6,10 @@ import os
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.resnet50 import preprocess_input
 
+"""
+Note this only works for rgb inputs and continuous omega outputs right now.
+"""
+
 def get_and_preprocess_img(img_path, img_size):
     img = image.load_img(img_path, target_size=img_size)
     x = image.img_to_array(img)
