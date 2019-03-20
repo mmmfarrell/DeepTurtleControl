@@ -35,13 +35,22 @@ def get_model(img_size):
     return transfer_model
 
 
+def save_model_and_weights(model_file):
+    print("Saving model weights to ", model_file)
+    model.save_weights(model_file + ".h5")
+    model_json = model.to_json()
+    with open(model_file + '.json', "w") as json_file:
+        json_file.write(model_json)
+    json_file.close()
+
+
 if __name__ == '__main__':
     # User Options
     gen_params = {'img_size': (120, 120),
                   'batch_size': 16,
                   'channels': 'rgb',
                   'shuffle': True}
-    load_model = True
+    load_model = False
     train_epochs = 100
     train_folder = 'tower_rope_circle_0_3_vel'
     # val_folder = 'tower_rope_circle_0_3_vel'
@@ -80,18 +89,19 @@ if __name__ == '__main__':
     model.compile(
         optimizer=tf.train.AdamOptimizer(),
         loss='mean_squared_error')
-    history = model.fit_generator(generator=training_generator,
-                                  # validation_data=val_generator,
-                                  epochs=train_epochs, use_multiprocessing=True,
-                                  workers=4)
+    try:
+        history = None
+        history = model.fit_generator(generator=training_generator,
+                                      # validation_data=val_generator,
+                                      epochs=train_epochs, use_multiprocessing=True,
+                                      workers=4)
+    except KeyboardInterrupt:
+        '''If you exit with Ctrl + C the weights will be saved'''
+        print("Got Keyboard Interrupt, saving model and closing")
+    save_model_and_weights(model_file)
 
-    print("Saving model weights to ", model_file)
-    model.save_weights(model_file + ".h5")
-    model_json = model.to_json()
-    with open(model_file + '.json', "w") as json_file:
-        json_file.write(model_json)
-    json_file.close()
+    if history:
+        losses = history.history['loss']
+        plt.plot(losses)
+        plt.show()
 
-    losses = history.history['loss']
-    plt.plot(losses)
-    plt.show()
