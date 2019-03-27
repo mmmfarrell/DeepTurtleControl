@@ -14,6 +14,13 @@ def get_and_preprocess_img(img_path, img_size):
     img = image.load_img(img_path, target_size=img_size)
     x = image.img_to_array(img)
     x = np.expand_dims(x, axis=0)
+
+    # add gaussian noise to image something like this
+    sigma = 1.
+    gauss = np.random.normal(0., sigma, x.shape)
+    x = x + gauss
+    x = np.clip(x, 0., 255.)
+
     x = preprocess_input(x)
 
     return x
@@ -91,7 +98,7 @@ class DataGenerator(keras.utils.Sequence):
         # Initialization
         num_channels = len(self.channels)
 
-        X = np.empty((self.batch_size, *self.img_size, num_channels))
+        X = np.empty((self.batch_size, self.img_size[0], self.img_size[1], num_channels))
         Y = np.empty((self.batch_size), dtype=float)
 
         # Generate data

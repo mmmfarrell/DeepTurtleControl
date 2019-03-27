@@ -19,7 +19,7 @@ Note this only works for rgb inputs and continuous omega outputs right now.
 
 
 def get_model(img_size):
-    input_shape = (*img_size, 3)
+    input_shape = (img_size[0], img_size[1], 3)
     resnet_model = ResNet50(weights='imagenet', include_top=False,
                             input_shape=input_shape)
 
