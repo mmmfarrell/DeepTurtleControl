@@ -52,7 +52,7 @@ if __name__ == '__main__':
                   'shuffle': True}
     load_model = False
     train_epochs = 100
-    train_folder = 'tower_rope_circle_0_3_vel'
+    train_folders = ['tower_rope_circle_0_3_vel', 'tower_rope_circle_2_0_3_vel']
     # val_folder = 'tower_rope_circle_0_3_vel'
 
     # Creat model
@@ -62,8 +62,9 @@ if __name__ == '__main__':
     ws_root = os.getcwd().split('catkin_ws')[0]
 
     # Load model or make a directory for the model
-    model_dir_path = os.path.join(ws_root, 'saved_models', train_folder)
-    model_name = train_folder + '_model'
+    test_name = '&'.join(train_folders)
+    model_dir_path = os.path.join(ws_root, 'saved_models', test_name)
+    model_name = test_name + '_model'
     model_file = os.path.join(model_dir_path, model_name)
     if not os.path.exists(model_dir_path):
         os.makedirs(model_dir_path)
@@ -80,8 +81,8 @@ if __name__ == '__main__':
         model.load_weights(model_file + ".h5")
 
     # create train and validation data generators
-    train_dir_path = os.path.join(ws_root, 'data', train_folder)
-    training_generator = DataGenerator(train_dir_path, **gen_params)
+    train_dir_paths = [os.path.join(ws_root, 'data', folder) for folder in train_folders]
+    training_generator = DataGenerator(train_dir_paths, **gen_params)
     # val_dir_path = os.path.join(ws_root, 'data', val_folder)
     # val_generator = DataGenerator(val_dir_path, **gen_params)
 

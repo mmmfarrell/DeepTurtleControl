@@ -31,9 +31,16 @@ def get_and_preprocess_command(cmd_path):
     return command['omega']
 
 def get_sorted_files_in_dir_with(directory, string_in_filename):
-    paths = [os.path.join(directory, filename) for filename in
-        os.listdir(directory) if (filename.endswith(('jpg', 'json')) and
-                        string_in_filename in filename)]
+    if isinstance(directory, list):
+        paths = []
+        for d in directory:
+            paths.extend([os.path.join(d, filename) for filename in
+                os.listdir(d) if (filename.endswith(('jpg', 'json')) and
+                                string_in_filename in filename)])
+    else:
+        paths = [os.path.join(directory, filename) for filename in
+            os.listdir(directory) if (filename.endswith(('jpg', 'json')) and
+                            string_in_filename in filename)]
     paths.sort()
 
     return paths
