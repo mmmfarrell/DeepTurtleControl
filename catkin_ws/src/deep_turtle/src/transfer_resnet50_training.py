@@ -10,6 +10,7 @@ from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.resnet50 import preprocess_input, decode_predictions
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras.models import Model, Sequential, model_from_json
+from tensorflow.keras.callbacks import EarlyStopping
 
 from data_generator import DataGenerator
 
@@ -50,10 +51,10 @@ if __name__ == '__main__':
                   'batch_size': 16,
                   'channels': 'rgb',
                   'shuffle': True}
-    load_model = False
+    load_model = True
     train_epochs = 100
     train_folders = ['tower_rope_circle_0_3_vel', 'tower_rope_circle_2_0_3_vel']
-    # val_folder = 'tower_rope_circle_0_3_vel'
+    val_folders = ['tower_rope_circle_3_0_3_vel']
 
     # Creat model
     model = get_model(gen_params['img_size'])
@@ -83,17 +84,21 @@ if __name__ == '__main__':
     # create train and validation data generators
     train_dir_paths = [os.path.join(ws_root, 'data', folder) for folder in train_folders]
     training_generator = DataGenerator(train_dir_paths, **gen_params)
-    # val_dir_path = os.path.join(ws_root, 'data', val_folder)
-    # val_generator = DataGenerator(val_dir_path, **gen_params)
+    val_dir_paths = [os.path.join(ws_root, 'data', folder) for folder in val_folders]
+    val_generator = DataGenerator(val_dir_paths, **gen_params)
 
     # Compile and train network
     model.compile(
         optimizer=tf.train.AdamOptimizer(),
         loss='mean_squared_error')
+
+    callbacks = [EarlyStopping(monitor='val_loss', patience=2)]
     try:
         history = None
         history = model.fit_generator(generator=training_generator,
-                                      # validation_data=val_generator,
+                                      callbacks=callbacks,
+                                      validation_data=val_generator,
+                                      validation_steps=25,
                                       epochs=train_epochs, use_multiprocessing=True,
                                       workers=4)
     except KeyboardInterrupt:
