@@ -25,10 +25,16 @@ def get_and_preprocess_img(img_path, img_size):
 
     return x
 
-def get_and_preprocess_command(cmd_path):
+def get_and_preprocess_command(cmd_path, outputs):
     command = json.load(open(cmd_path))
-
-    return command['omega']
+    omega = command['omega']
+    if outputs > 1:
+        bin_size = 2.0/outputs
+        bin_idx = int((omega+1.0)/bin_size)
+        # One-hot encoding
+        return [float(i == bin_idx) for i in range(outputs)]
+    else:
+        return omega
 
 def get_sorted_files_in_dir_with(directory, string_in_filename):
     if isinstance(directory, list):
@@ -51,13 +57,14 @@ class DataGenerator(keras.utils.Sequence):
     https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly
     '''
     def __init__(self, directory, channels='rgb', batch_size=32, img_size=(32,32),
-                 shuffle=True):
+                 shuffle=True, outputs=1):
         '''Initialization'''
         self.directory = directory
         self.channels = channels
         self.batch_size = batch_size
         self.img_size = img_size
         self.shuffle = shuffle
+        self.outputs = outputs
 
         self.rgb_img_paths = get_sorted_files_in_dir_with(directory, 'rgb')
         self.command_json_paths = get_sorted_files_in_dir_with(directory,
@@ -106,7 +113,7 @@ class DataGenerator(keras.utils.Sequence):
         num_channels = len(self.channels)
 
         X = np.empty((self.batch_size, self.img_size[0], self.img_size[1], num_channels))
-        Y = np.empty((self.batch_size), dtype=float)
+        Y = np.empty((self.batch_size, self.outputs), dtype=float)
 
         # Generate data
         for i, img_idx in enumerate(batch_indexes):
@@ -119,7 +126,7 @@ class DataGenerator(keras.utils.Sequence):
 
             # Get output for the img
             cmd_path = self.command_json_paths[img_idx]
-            command_output = get_and_preprocess_command(cmd_path)
-            Y[i] = command_output
+            command_output = get_and_preprocess_command(cmd_path, self.outputs)
+            Y[i,:] = command_output
 
         return X, Y
