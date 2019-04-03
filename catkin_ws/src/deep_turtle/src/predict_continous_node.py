@@ -103,6 +103,7 @@ class ContinuousNeuralController():
     def publish_smooth_cmd(self, predict_out):
         cmd_msg = Twist()
         alpha = 0.5
+        cmd_msg.linear.x = 0.3
         cmd_msg.angular.z = alpha * self.last_command + (1. - alpha) * predict_out
         self._cmd_smooth_pub.publish(cmd_msg)
 

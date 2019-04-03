@@ -53,7 +53,8 @@ class TurtleControl():
             self.cmd_msg.linear.x = self.constant_vel
             self.cmd_msg.angular.z = self.joy_omega
         elif self.cmd_type == 2: # auto command
-            self.cmd_msg.linear.x = self.auto_cmd.linear.x
+            self.cmd_msg.linear.x = self.constant_vel
+            # self.cmd_msg.linear.x = self.auto_cmd.linear.x
             self.cmd_msg.angular.z = self.auto_cmd.angular.z
         self._cmd_pub.publish(self.cmd_msg)
 
