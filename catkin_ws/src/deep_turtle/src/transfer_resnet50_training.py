@@ -47,14 +47,14 @@ def save_model_and_weights(model_file):
 
 if __name__ == '__main__':
     # User Options
-    gen_params = {'img_size': (120, 120),
+    gen_params = {'img_size': (96, 128),
                   'batch_size': 16,
                   'channels': 'rgb',
                   'shuffle': True}
-    load_model = True
+    load_model = False
     train_epochs = 100
-    train_folders = ['tower_rope_circle_0_3_vel', 'tower_rope_circle_2_0_3_vel']
-    val_folders = ['tower_rope_circle_3_0_3_vel']
+    train_folders = ['wide_angle_2']
+    # val_folders = ['tower_rope_circle_3_0_3_vel']
 
     # Creat model
     model = get_model(gen_params['img_size'])
@@ -63,7 +63,8 @@ if __name__ == '__main__':
     ws_root = os.getcwd().split('catkin_ws')[0]
 
     # Load model or make a directory for the model
-    test_name = '&'.join(train_folders)
+    # test_name = '&'.join(train_folders)
+    test_name = 'wide_angle_1'
     model_dir_path = os.path.join(ws_root, 'saved_models', test_name)
     model_name = test_name + '_model'
     model_file = os.path.join(model_dir_path, model_name)
@@ -84,21 +85,21 @@ if __name__ == '__main__':
     # create train and validation data generators
     train_dir_paths = [os.path.join(ws_root, 'data', folder) for folder in train_folders]
     training_generator = DataGenerator(train_dir_paths, **gen_params)
-    val_dir_paths = [os.path.join(ws_root, 'data', folder) for folder in val_folders]
-    val_generator = DataGenerator(val_dir_paths, **gen_params)
+    # val_dir_paths = [os.path.join(ws_root, 'data', folder) for folder in val_folders]
+    # val_generator = DataGenerator(val_dir_paths, **gen_params)
 
     # Compile and train network
     model.compile(
         optimizer=tf.train.AdamOptimizer(),
         loss='mean_squared_error')
 
-    callbacks = [EarlyStopping(monitor='val_loss', patience=2)]
+    # callbacks = [EarlyStopping(monitor='val_loss', patience=2)]
     try:
         history = None
         history = model.fit_generator(generator=training_generator,
-                                      callbacks=callbacks,
-                                      validation_data=val_generator,
-                                      validation_steps=25,
+                                 #      callbacks=callbacks,
+                                      # validation_data=val_generator,
+                                 #      validation_steps=25,
                                       epochs=train_epochs, use_multiprocessing=True,
                                       workers=4)
     except KeyboardInterrupt:
