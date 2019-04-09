@@ -31,8 +31,9 @@ class ContinuousNeuralController():
         self.bridge = CvBridge()
 
         print("b4 param")
-        # self.test_name = rospy.get_param("~model_name")
-        self.test_name = "rope1/rope1"
+        #self.test_name = rospy.get_param("~model_name")
+        self.test_name = "wide_angle_1/wide_angle_1_model"
+        print(self.test_name)
 
         rospack = rospkg.RosPack()
         ws_root = rospack.get_path("deep_turtle").split('catkin_ws')[0]
@@ -58,6 +59,7 @@ class ContinuousNeuralController():
         # assert(os.path.isfile(model_file + ".json")), \
             # "No model found at {}".format(model_file + ".json")
         if (not os.path.isfile(model_file + ".json")):
+            print(model_file)
             rospy.logwarn("ERROR")
         else:
             rospy.logwarn("GOOD")
@@ -87,7 +89,7 @@ class ContinuousNeuralController():
         # self.current_record_idx += 1
 
     def predict_from_cv_img(self, img):
-        x = cv2.resize(img, (120, 120))
+        x = cv2.resize(img, (128, 96))
         x = np.expand_dims(x, axis=0)
         x = preprocess_input(x)
 
@@ -105,6 +107,7 @@ class ContinuousNeuralController():
         alpha = 0.5
         cmd_msg.linear.x = 0.3
         cmd_msg.angular.z = alpha * self.last_command + (1. - alpha) * predict_out
+        self.last_command = cmd_msg.angular.z
         self._cmd_smooth_pub.publish(cmd_msg)
 
 

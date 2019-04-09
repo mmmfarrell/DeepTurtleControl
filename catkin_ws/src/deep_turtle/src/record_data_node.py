@@ -46,16 +46,17 @@ class DataRecorder():
                 self.record_callback)
 
         rgb_sub = message_filters.Subscriber('rgb_image', Image)
-        depth_sub = message_filters.Subscriber('depth_image', Image)
+        #depth_sub = message_filters.Subscriber('depth_image', Image)
         cmd_sub = message_filters.Subscriber('turtlebot_command', Twist)
 
-        ts = message_filters.ApproximateTimeSynchronizer([rgb_sub, depth_sub,
+        ts = message_filters.ApproximateTimeSynchronizer([rgb_sub, #depth_sub,
             cmd_sub], 10, 0.1, allow_headerless=True)
         ts.registerCallback(self.combined_callback)
 
         rospy.spin()
 
-    def combined_callback(self, rgb_msg, depth_msg, cmd_msg):
+    #def combined_callback(self, rgb_msg, depth_msg, cmd_msg):
+    def combined_callback(self, rgb_msg, cmd_msg):
         if not self.record:
             return
 
@@ -85,18 +86,18 @@ class DataRecorder():
         cv2.imwrite(rgb_file_name, rgb_cv_image)
 
         # Write depth image as npy
-        depth_file_name = self.record_dir + "/" + index_string + "_depth.jpg"
-        try:
-          depth_cv_image = self.bridge.imgmsg_to_cv2(depth_msg, "32FC1")
-        except CvBridgeError as e:
-          print(e)
-          return
-        cv_image_array = np.array(depth_cv_image, dtype = np.dtype('f8'))
-        cv_image_norm = cv2.normalize(cv_image_array, cv_image_array, 0, 1,
-                cv2.NORM_MINMAX)
-        cv_image_norm = cv_image_norm * 255
-        cv_image_norm = cv_image_norm.astype(np.uint8)
-        cv2.imwrite(depth_file_name, cv_image_norm)
+        #depth_file_name = self.record_dir + "/" + index_string + "_depth.jpg"
+        #try:
+        #  depth_cv_image = self.bridge.imgmsg_to_cv2(depth_msg, "32FC1")
+        #except CvBridgeError as e:
+        #  print(e)
+        #  return
+        #cv_image_array = np.array(depth_cv_image, dtype = np.dtype('f8'))
+        #cv_image_norm = cv2.normalize(cv_image_array, cv_image_array, 0, 1,
+        #        cv2.NORM_MINMAX)
+        #cv_image_norm = cv_image_norm * 255
+        #cv_image_norm = cv_image_norm.astype(np.uint8)
+        #cv2.imwrite(depth_file_name, cv_image_norm)
 
         self.current_record_idx += 1
 
