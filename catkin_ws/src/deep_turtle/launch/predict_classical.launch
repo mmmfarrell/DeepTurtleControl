@@ -5,7 +5,6 @@
 
   <!-- Predict from saved model-->
   <node pkg="deep_turtle" type="predict_classical.py" name="neural_controller" output="screen">
-    <param name="model_name" value="rope1/rope1"/>
     <remap from="rgb_image" to="/camera/color/image_raw"/>
   </node>
 

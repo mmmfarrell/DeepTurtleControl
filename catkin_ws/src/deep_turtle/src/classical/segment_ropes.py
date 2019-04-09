@@ -74,15 +74,17 @@ class Segmenter():
         cont_sorted = sorted(contours, key=cv2.contourArea, reverse=True)[:2]
 
         y_pt = img.shape[0] / 3
+        #y_pt = img.shape[0] / 2
         middles = {}
-        middles['left'] = (0, y_pt)
-        middles['right'] = (640, y_pt)
+        buff = 50
+        middles['left'] = (-buff, y_pt)
+        middles['right'] = (640+buff, y_pt)
         # left_idxs = [200:480, 0:250]
         for idx in range(len(cont_sorted) - 1, -1, -1):
             mask = np.zeros_like(mask)
             cv2.drawContours(mask, cont_sorted, idx, 255, -1)
-            left_lane = np.any(mask[200:480, 0:250])
-            right_lane = np.any(mask[200:480, (640-250):640])
+            left_lane = np.any(mask[300:480, 0:250])
+            right_lane = np.any(mask[300:480, (640-250):640])
 
             # if left_lane:
                 # cv2.imshow("left", mask)
@@ -106,7 +108,7 @@ class Segmenter():
 
         avg_middle_x = (middles['left'][0] + middles['right'][0]) / 2
         avg_middle_y = (middles['left'][1] + middles['right'][1]) / 2
-        cv2.circle(img, (avg_middle_x, avg_middle_y), 10, (0, 0, 255), -1)
+        #cv2.circle(img, (avg_middle_x, avg_middle_y), 10, (0, 0, 255), -1)
 
         return img, avg_middle_x
 

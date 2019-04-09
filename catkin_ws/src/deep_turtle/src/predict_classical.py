@@ -26,7 +26,7 @@ class ContinuousNeuralController():
 
         self.bridge = CvBridge()
 
-        print("b4 param")
+        print("Classical Control")
 
         rospack = rospkg.RosPack()
 
@@ -64,8 +64,10 @@ class ContinuousNeuralController():
         # self.current_record_idx += 1
 
     def compute_control(self, mid_x):
-        scale = 1.
-        true_middle = 320
+        scale = 2.0
+        #true_middle = 320
+        # This is only because the camera isnt aligned with the robot, its tilted
+        true_middle = 240
         max_err = float(true_middle)
 
         # If err is positive, turn left, which is positive omega
