@@ -16,10 +16,10 @@ def get_and_preprocess_img(img_path, img_size):
     x = np.expand_dims(x, axis=0)
 
     # add gaussian noise to image something like this
-    sigma = 1.
-    gauss = np.random.normal(0., sigma, x.shape)
-    x = x + gauss
-    x = np.clip(x, 0., 255.)
+    # sigma = 1.
+    # gauss = np.random.normal(0., sigma, x.shape)
+    # x = x + gauss
+    # x = np.clip(x, 0., 255.)
 
     x = preprocess_input(x)
 
