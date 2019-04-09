@@ -12,99 +12,6 @@ class Segmenter():
     def __init__(self):
         pass
 
-    def get_angle_from_contour_mask(self, img, mask):
-        lines = cv2.HoughLines(mask,1,np.pi/180,200)
-
-        if lines is None:
-            return None
-
-        avg_theta = 0.
-        avg_rho = 0.
-        for i in range(len(lines)):
-                for rho,theta in lines[i]:
-                    avg_theta += theta / len(lines)
-                    avg_rho += rho / len(lines)
-
-                    # a = np.cos(theta)
-                    # b = np.sin(theta)
-                    # x0 = a*rho
-                    # y0 = b*rho
-                    # x1 = int(x0 + 1000*(-b))
-                    # y1 = int(y0 + 1000*(a))
-                    # x2 = int(x0 - 1000*(-b))
-                    # y2 = int(y0 - 1000*(a))
-
-                    # cv2.line(img,(x1,y1),(x2,y2),(0,0,255),2)
-
-        theta = avg_theta
-        rho = avg_rho
-        a = np.cos(theta)
-        b = np.sin(theta)
-        x0 = a*rho
-        y0 = b*rho
-        x1 = int(x0 + 1000*(-b))
-        y1 = int(y0 + 1000*(a))
-        x2 = int(x0 - 1000*(-b))
-        y2 = int(y0 - 1000*(a))
-        cv2.line(img,(x1,y1),(x2,y2),(0,255,0),2)
-        # print(avg_theta)
-        return avg_theta
-
-    def draw_avg_line(self, img, avg_angle):
-        if avg_angle:
-            x0 = img.shape[1] / 2
-            y0 = img.shape[0]
-            print(img.shape)
-
-            a = np.cos(avg_angle)
-            b = np.sin(avg_angle)
-            # x1 = int(x0 + 1000*(-b))
-            # y1 = int(y0 + 1000*(a))
-            # print("xo: ", x0)
-            # print("yo: ", y0)
-            # print("x1: ", x1)
-            # print("y1: ", y1)
-            x1 = int(x0 + 1000*(-b))
-            y1 = int(y0 + 1000*(a))
-            x2 = int(x0 - 1000*(-b))
-            y2 = int(y0 - 1000*(a))
-            cv2.line(img,(x1,y1),(x2,y2),(0,0,255),2)
-
-        return img
-
-    def filter_angles(self, angles):
-        # Filter out the "Nones"
-        angles = [ang for ang in angles if ang]
-
-        # Wrap between -pi/2, pi/2
-        for idx, ang in enumerate(angles):
-            # if ang < -np.pi / 2.:
-                # ang += 2. * np.pi
-            if ang > np. pi /2.:
-                ang -=  np.pi
-            angles[idx] = ang
-
-        return angles
-
-    # def perspective_warp(self, img):
-        # dst_size=(640, 480)
-        # src=np.float32([(0.43,0.65),(0.58,0.65),(0.1,1),(1,1)])
-        # dst=np.float32([(0,0), (1, 0), (0,1), (1,1)])
-        # img_size = np.float32([(img.shape[1],img.shape[0])])
-
-        # src = src* img_size
-        # # For destination points, I'm arbitrarily choosing some points to be
-        # # a nice fit for displaying our warped result
-        # # again, not exact, but close enough for our purposes
-        # dst = dst * np.float32(dst_size)
-        # # Given src and dst points, calculate the perspective transform matrix
-        # M = cv2.getPerspectiveTransform(src, dst)
-        # # Warp the image using OpenCV warpPerspective()
-        # warped = cv2.warpPerspective(img, M, dst_size)
-        # cv2.imshow("warped", warped)
-
-        # return warped
-
 
     def get_poly_from_mask(self, mask):
         ydata, xdata = np.where(mask == 255)
@@ -119,8 +26,6 @@ class Segmenter():
         x_fit = f(y_fit)
 
         x_fit = map(int, x_fit)
-        # print("xfit: ", map(int, x_fit))
-        # print("yfit: ", y_fit)
 
         ymin = 0
         ymax = img.shape[1]
@@ -137,17 +42,21 @@ class Segmenter():
                 # print(img[xidx, yidx])
                 img[yidx, xidx] = [0, 0, 255]
 
-        y_middle = img.shape[0] / 3
+        pt = self.get_middle_point(f, 160)
+        # y_middle = img.shape[0] / 3
+        # x_middle = f(y_middle)
+        # x_middle = int(x_middle)
+        # cv2.circle(img, (x_middle, y_middle), 10, (0, 255, 0), -1)
+        cv2.circle(img, pt, 10, (0, 255, 0), -1)
+
+    def get_middle_point(self, f, y_pt):
+        y_middle = y_pt
         x_middle = f(y_middle)
         x_middle = int(x_middle)
-        cv2.circle(img, (x_middle, y_middle), 10, (0, 255, 0), -1)
-        # cv2.imshow("fit", fit)
-        # print(xdata)
-        # print(ydata)
+
+        return (x_middle, y_middle)
 
     def segment_img(self, img):
-
-        # self.perspective_warp(img)
 
         # Hue Lightness Saturation
         img_hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)
@@ -164,40 +73,42 @@ class Segmenter():
 
         cont_sorted = sorted(contours, key=cv2.contourArea, reverse=True)[:2]
 
-        print(len(cont_sorted))
-        angles = []
-        for idx, cont in enumerate(cont_sorted):
+        y_pt = img.shape[0] / 3
+        middles = {}
+        middles['left'] = (0, y_pt)
+        middles['right'] = (640, y_pt)
+        # left_idxs = [200:480, 0:250]
+        for idx in range(len(cont_sorted) - 1, -1, -1):
             mask = np.zeros_like(mask)
             cv2.drawContours(mask, cont_sorted, idx, 255, -1)
-            ang = self.get_angle_from_contour_mask(img, mask)
-            # print("angle1: {}".format(angle_1))
-            angles.append(ang)
-            cv2.imshow("cont " + str(idx), mask)
+            left_lane = np.any(mask[200:480, 0:250])
+            right_lane = np.any(mask[200:480, (640-250):640])
 
-            print("Contour area: ", cv2.contourArea(cont_sorted[idx]))
+            # if left_lane:
+                # cv2.imshow("left", mask)
+            # if right_lane:
+                # cv2.imshow("right", mask)
+            if left_lane and right_lane:
+                print("ERROR, both right and left")
+                continue
+
+            # print("Contour area: ", cv2.contourArea(cont_sorted[idx]))
             cont_area = cv2.contourArea(cont_sorted[idx])
-            cont_thresh = 4000.
+            cont_thresh = 2000.
             if cont_area > cont_thresh:
                 poly = self.get_poly_from_mask(mask)
                 self.draw_poly(poly, img)
 
-            # mask = np.zeros_like(mask)
-            # cv2.drawContours(mask, cont_sorted, 1, 255, -1)
-            # angle_2 = self.get_angle_from_contour_mask(img, mask)
-            # print("angle2: {}".format(angle_2))
+                if left_lane:
+                    middles['left'] = self.get_middle_point(poly, y_pt)
+                if right_lane:
+                    middles['right'] = self.get_middle_point(poly, y_pt)
 
-        # angles = [angle_1, angle_2]
-        angles = self.filter_angles(angles)
-        print(angles)
+        avg_middle_x = (middles['left'][0] + middles['right'][0]) / 2
+        avg_middle_y = (middles['left'][1] + middles['right'][1]) / 2
+        cv2.circle(img, (avg_middle_x, avg_middle_y), 10, (0, 0, 255), -1)
 
-        avg_ang = 0.
-        for ang in angles:
-            avg_ang += ang / len(angles)
-
-        # TODO what to do if both are bad
-        img = self.draw_avg_line(img, avg_ang)
-
-        return img
+        return img, avg_middle_x
 
 
 if __name__ == '__main__':
