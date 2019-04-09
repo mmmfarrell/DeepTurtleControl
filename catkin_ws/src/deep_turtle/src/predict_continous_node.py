@@ -22,6 +22,8 @@ from tensorflow.keras.models import model_from_json
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.resnet50 import preprocess_input
 
+from classical.segment_ropes import Segmenter
+
 class ContinuousNeuralController():
 
     def __init__(self):
@@ -40,6 +42,8 @@ class ContinuousNeuralController():
 
         self.model = self.load_model(model_dir)
         self.graph = tf.get_default_graph()
+
+        self.seg = Segmenter()
 
         self.last_command = 0.
 
@@ -77,9 +81,15 @@ class ContinuousNeuralController():
     def rgb_image_callback(self, rgb_msg):
         try:
           rgb_cv_image = self.bridge.imgmsg_to_cv2(rgb_msg, "bgr8")
-          output = self.predict_from_cv_img(rgb_cv_image)
-          self.publish_cmd(output)
-          self.publish_smooth_cmd(output)
+          seg_img = rgb_cv_image.copy()
+          seg_img = self.seg.segment_img(seg_img)
+
+          cv2.imshow("raw img", rgb_cv_image)
+          cv2.imshow("output", seg_img)
+          cv2.waitKey(1)
+          # output = self.predict_from_cv_img(rgb_cv_image)
+          # self.publish_cmd(output)
+          # self.publish_smooth_cmd(output)
         except CvBridgeError as e:
           print(e)
           return
