@@ -66,17 +66,49 @@ class Segmenter():
         upper_white = np.array([255, 255, 255], dtype=np.uint8)
 
         mask = cv2.inRange(img_hls, lower_white, upper_white)
+        # cv2.imshow("mask", mask)
 
         i, contours, heirarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL,
                 cv2.CHAIN_APPROX_SIMPLE)
 
         cont_sorted = sorted(contours, key=cv2.contourArea, reverse=True)[:2]
 
-        mask = np.zeros_like(mask)
+        y_pt = img.shape[0] / 3
+        middles = {}
+        middles['left'] = (0, y_pt)
+        middles['right'] = (640, y_pt)
+        # left_idxs = [200:480, 0:250]
         for idx in range(len(cont_sorted) - 1, -1, -1):
+            mask = np.zeros_like(mask)
             cv2.drawContours(mask, cont_sorted, idx, 255, -1)
+            left_lane = np.any(mask[200:480, 0:250])
+            right_lane = np.any(mask[200:480, (640-250):640])
 
-        return mask / 255.
+            # if left_lane:
+                # cv2.imshow("left", mask)
+            # if right_lane:
+                # cv2.imshow("right", mask)
+            if left_lane and right_lane:
+                print("ERROR, both right and left")
+                continue
+
+            # print("Contour area: ", cv2.contourArea(cont_sorted[idx]))
+            cont_area = cv2.contourArea(cont_sorted[idx])
+            cont_thresh = 2000.
+            if cont_area > cont_thresh:
+                poly = self.get_poly_from_mask(mask)
+                self.draw_poly(poly, img)
+
+                if left_lane:
+                    middles['left'] = self.get_middle_point(poly, y_pt)
+                if right_lane:
+                    middles['right'] = self.get_middle_point(poly, y_pt)
+
+        avg_middle_x = (middles['left'][0] + middles['right'][0]) / 2
+        avg_middle_y = (middles['left'][1] + middles['right'][1]) / 2
+        cv2.circle(img, (avg_middle_x, avg_middle_y), 10, (0, 0, 255), -1)
+
+        return img, avg_middle_x
 
 
 if __name__ == '__main__':
