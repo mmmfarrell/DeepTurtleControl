@@ -69,7 +69,8 @@ class ContinuousNeuralController():
         # self.current_record_idx += 1
 
     def compute_control(self, mid_x):
-        scale = 1.0
+        # scale = 2.0
+        scale = 5.0
         #true_middle = 320
         # This is only because the camera isnt aligned with the robot, its tilted
         true_middle = 240
