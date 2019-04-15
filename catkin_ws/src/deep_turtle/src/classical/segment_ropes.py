@@ -57,7 +57,7 @@ class Segmenter():
         upper_white = np.array([255, 255, 255], dtype=np.uint8)
 
         mask = cv2.inRange(img_hls, lower_white, upper_white)
-        cv2.imshow("mask", mask)
+        # cv2.imshow("mask", mask)
 
         i, contours, heirarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL,
                 cv2.CHAIN_APPROX_SIMPLE)
@@ -81,10 +81,10 @@ class Segmenter():
                 print("ERROR, both right and left")
                 continue
 
-            if left_lane:
-                cv2.imshow("left", mask)
-            if right_lane:
-                cv2.imshow("right", mask)
+            # if left_lane:
+                # cv2.imshow("left", mask)
+            # if right_lane:
+                # cv2.imshow("right", mask)
 
             # print("Contour area: ", cv2.contourArea(cont_sorted[idx]))
             cont_area = cv2.contourArea(cont_sorted[idx])

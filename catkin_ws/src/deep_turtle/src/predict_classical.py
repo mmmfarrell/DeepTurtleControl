@@ -55,7 +55,7 @@ class ContinuousNeuralController():
 
           # cv2.imshow("raw img", rgb_cv_image)
           # cv2.imshow("output", seg_img)
-          cv2.waitKey(1)
+          # cv2.waitKey(1)
           # output = self.predict_from_cv_img(rgb_cv_image)
           self.publish_cmd(omega)
           self.publish_smooth_cmd(omega)
