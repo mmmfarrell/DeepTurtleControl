@@ -34,12 +34,14 @@ class ContinuousNeuralController():
 
         self.last_command = 0.
 
-        self._rgb_sub = rospy.Subscriber("rgb_image", Image,
-                self.rgb_image_callback, queue_size=1, buff_size=2**24)
         self._cmd_pub = rospy.Publisher('auto_cmd_raw', Twist,
                 queue_size=10)
         self._cmd_smooth_pub = rospy.Publisher('auto_cmd_smooth', Twist,
                 queue_size=10)
+        self._mask_pub = rospy.Publisher('seg_mask', Image)
+
+        self._rgb_sub = rospy.Subscriber("rgb_image", Image,
+                self.rgb_image_callback, queue_size=1, buff_size=2**24)
 
         rospy.spin()
 
@@ -57,6 +59,9 @@ class ContinuousNeuralController():
           # output = self.predict_from_cv_img(rgb_cv_image)
           self.publish_cmd(omega)
           self.publish_smooth_cmd(omega)
+
+          image_msg = self.bridge.cv2_to_imgmsg(seg_img, encoding="bgr8")
+          self._mask_pub.publish(image_msg)
         except CvBridgeError as e:
           print(e)
           return
