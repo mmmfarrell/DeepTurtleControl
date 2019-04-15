@@ -74,12 +74,20 @@ class Segmenter():
         for idx in range(len(cont_sorted) - 1, -1, -1):
             mask = np.zeros_like(mask)
             cv2.drawContours(mask, cont_sorted, idx, 255, -1)
-            left_lane = np.any(mask[100:290, 0:150])
-            right_lane = np.any(mask[100:290, 340:640])
+            left_lane = np.any(mask[100:290, 0:240])
+            right_lane = np.any(mask[100:290, 240:640])
 
             if left_lane and right_lane:
+                left_idxs = np.where(np.any(mask[100:290, 0:150]))[0]
+                right_idxs = np.where(np.any(mask[100:290, 340:640]))[0]
+
                 print("ERROR, both right and left")
-                continue
+                if left_idxs.max() > right_idxs.max():
+                    right_lane = False
+                    print("I think its the right lane though")
+                else:
+                    left_lane = False
+                    print("I think its the left lane though")
 
             # if left_lane:
                 # cv2.imshow("left", mask)
@@ -108,8 +116,8 @@ class Segmenter():
         cv2.circle(img, (avg_middle_x, avg_middle_y), 10, (0, 0, 255), -1)
 
         # Draw left and right lane detection
-        img = cv2.rectangle(img, (0, 100), (150, 290), (0, 0, 255), 3)
-        img = cv2.rectangle(img, (640, 100), (340, 290), (0, 0, 255), 3)
+        img = cv2.rectangle(img, (0, 100), (240, 290), (0, 0, 255), 3)
+        img = cv2.rectangle(img, (640, 100), (240, 290), (0, 0, 255), 3)
 
         return img, avg_middle_x
 
