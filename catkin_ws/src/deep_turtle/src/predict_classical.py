@@ -38,7 +38,7 @@ class ContinuousNeuralController():
                 queue_size=10)
         self._cmd_smooth_pub = rospy.Publisher('auto_cmd_smooth', Twist,
                 queue_size=10)
-        self._mask_pub = rospy.Publisher('seg_mask', Image)
+        self._mask_pub = rospy.Publisher('seg_mask', Image, queue_size=10)
 
         self._rgb_sub = rospy.Subscriber("rgb_image", Image,
                 self.rgb_image_callback, queue_size=1, buff_size=2**24)
@@ -55,7 +55,7 @@ class ContinuousNeuralController():
 
           # cv2.imshow("raw img", rgb_cv_image)
           # cv2.imshow("output", seg_img)
-          # cv2.waitKey(1)
+          cv2.waitKey(1)
           # output = self.predict_from_cv_img(rgb_cv_image)
           self.publish_cmd(omega)
           self.publish_smooth_cmd(omega)
@@ -69,11 +69,11 @@ class ContinuousNeuralController():
         # self.current_record_idx += 1
 
     def compute_control(self, mid_x):
-        scale = 2.0
+        scale = 1.0
         #true_middle = 320
         # This is only because the camera isnt aligned with the robot, its tilted
         true_middle = 240
-        max_err = float(true_middle)
+        max_err = abs(float(640 - true_middle))
 
         # If err is positive, turn left, which is positive omega
         err = true_middle - mid_x
@@ -94,6 +94,8 @@ class ContinuousNeuralController():
         cmd_msg.linear.x = 0.3
         cmd_msg.angular.z = alpha * self.last_command + (1. - alpha) * predict_out
         self._cmd_smooth_pub.publish(cmd_msg)
+
+        self.last_command = cmd_msg.angular.z
 
 
 if __name__ == '__main__':
