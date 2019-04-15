@@ -48,6 +48,7 @@ class Segmenter():
     def segment_img(self, img):
 
         img = cv2.rectangle(img, (0, 290), (640, 480), (0, 0, 0), -1)
+        img = cv2.rectangle(img, (0, 0), (640, 100), (0, 0, 0), -1)
 
         # Hue Lightness Saturation
         img_hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)
@@ -78,8 +79,8 @@ class Segmenter():
             right_lane = np.any(mask[100:290, 240:640])
 
             if left_lane and right_lane:
-                left_idxs = np.where(np.any(mask[100:290, 0:150]))[0]
-                right_idxs = np.where(np.any(mask[100:290, 340:640]))[0]
+                left_idxs = np.where(np.any(mask[100:290, 0:240]))[0]
+                right_idxs = np.where(np.any(mask[100:290, 240:640]))[0]
 
                 print("ERROR, both right and left")
                 if left_idxs.max() > right_idxs.max():
