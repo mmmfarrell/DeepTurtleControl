@@ -5,9 +5,9 @@ import os
 
 import tensorflow as tf
 from tensorflow.keras import layers
-from tensorflow.keras.applications.densenet import DenseNet201
+from tensorflow.keras.applications.densenet import DenseNet121
 from tensorflow.keras.preprocessing import image
-from tensorflow.keras.applications.resnet50 import preprocess_input, decode_predictions
+# from tensorflow.keras.applications.resnet50 import preprocess_input, decode_predictions
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras.models import Model, Sequential, model_from_json
 
@@ -20,7 +20,7 @@ Note this only works for rgb inputs and continuous omega outputs right now.
 
 def get_model(img_size, outputs=1):
     input_shape = (img_size[1], img_size[0], 3)
-    resnet_model = DenseNet201(weights=None, include_top=False,
+    resnet_model = DenseNet121(weights='imagenet', include_top=False,
                             input_shape=input_shape)
 
     x = layers.Flatten()(resnet_model.output)
@@ -80,9 +80,9 @@ if __name__ == '__main__':
     load_model = False
     train_epochs = 25
     # train_folders = ['tower_rope_circle_0_3_vel', 'tower_rope_circle_2_0_3_vel']
-    train_folders = ['classical_bins_100']
+    train_folders = ['classical_bins']
     # train_folder = 'single_test'
-    val_folder = 'tower_rope_circle_3_0_3_vel_val500'
+    val_folder = 'classical_bins_100'
 
     # Creat model
     model = get_model(gen_params['img_size'], outputs=gen_params['outputs'])
@@ -117,7 +117,8 @@ if __name__ == '__main__':
 
     # Compile and train network
     if gen_params['outputs'] > 1:
-        loss_function = CategoricalDistanceLoss(gen_params['outputs'])
+        # loss_function = CategoricalDistanceLoss(gen_params['outputs'])
+        loss_function = 'categorical_crossentropy'
     else:
         loss_function = 'mean_squared_error'
     model.compile(
