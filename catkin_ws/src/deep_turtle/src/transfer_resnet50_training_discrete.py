@@ -68,13 +68,13 @@ def save_model_and_weights(model_file):
 
 if __name__ == '__main__':
     # User Options
-    gen_params = {'img_size': (120, 120),
+    gen_params = {'img_size': (120, 160),
                   'batch_size': 10,
                   'channels': 'rgb',
                   'shuffle': True,
-                  'outputs': 15 } # outputs > 1 = omega_bins
+                  'outputs': 5 } # outputs > 1 = omega_bins
     load_model = True
-    train_epochs = 100
+    train_epochs = 25
     train_folders = ['tower_rope_circle_0_3_vel', 'tower_rope_circle_2_0_3_vel']
     # train_folder = 'single_test'
     val_folder = 'tower_rope_circle_3_0_3_vel_val500'
