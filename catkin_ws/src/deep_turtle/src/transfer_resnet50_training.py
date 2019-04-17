@@ -53,8 +53,8 @@ if __name__ == '__main__':
                   'shuffle': True}
     load_model = False
     train_epochs = 100
-    train_folders = ['wide_angle_2']
-    # val_folders = ['tower_rope_circle_3_0_3_vel']
+    train_folders = ['classical_circle']
+    val_folders = ['classical_circle_val']
 
     # Creat model
     model = get_model(gen_params['img_size'])
@@ -64,7 +64,7 @@ if __name__ == '__main__':
 
     # Load model or make a directory for the model
     # test_name = '&'.join(train_folders)
-    test_name = 'wide_angle_1'
+    test_name = 'classical_circ'
     model_dir_path = os.path.join(ws_root, 'saved_models', test_name)
     model_name = test_name + '_model'
     model_file = os.path.join(model_dir_path, model_name)
@@ -85,8 +85,8 @@ if __name__ == '__main__':
     # create train and validation data generators
     train_dir_paths = [os.path.join(ws_root, 'data', folder) for folder in train_folders]
     training_generator = DataGenerator(train_dir_paths, **gen_params)
-    # val_dir_paths = [os.path.join(ws_root, 'data', folder) for folder in val_folders]
-    # val_generator = DataGenerator(val_dir_paths, **gen_params)
+    val_dir_paths = [os.path.join(ws_root, 'data', folder) for folder in val_folders]
+    val_generator = DataGenerator(val_dir_paths, **gen_params)
 
     # Compile and train network
     model.compile(
@@ -98,7 +98,7 @@ if __name__ == '__main__':
         history = None
         history = model.fit_generator(generator=training_generator,
                                  #      callbacks=callbacks,
-                                      # validation_data=val_generator,
+                                      validation_data=val_generator,
                                  #      validation_steps=25,
                                       epochs=train_epochs, use_multiprocessing=True,
                                       workers=4)
