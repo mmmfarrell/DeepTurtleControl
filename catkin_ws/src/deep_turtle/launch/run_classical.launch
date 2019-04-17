@@ -18,23 +18,14 @@
     <param name="joy_omega_max" value="1."/>
     <param name="constant_vel" value="0.3"/>
     <remap from="turtle_cmd" to="/mobile_base/commands/velocity"/>
+    <!--<remap from="auto_cmd" to="/auto_cmd_raw"/>-->
     <remap from="auto_cmd" to="/auto_cmd_smooth"/>
   </node>
 
-  <!-- Predict using classical methods-->
+  <!-- Predict from saved model-->
   <node pkg="deep_turtle" type="predict_classical.py" name="neural_controller" output="screen">
     <remap from="rgb_image" to="/cv_camera/image_raw"/>
   </node>
 
-  <!--Data Recorder-->
-  <node pkg="deep_turtle" type="record_data_node.py" name="data_recorder" output="screen">
-    <param name="test_name" value="classical_circle"/>
-    <!--Record Every Nth frame-->
-    <param name="record_n_frames" value="2"/>
-    <remap from="record_data" to="/record_data"/>
-    <remap from="rgb_image" to="/cv_camera/image_raw"/>
-    <!--<remap from="depth_image" to="/camera/depth/image_rect_raw"/>-->
-    <remap from="turtlebot_command" to="/mobile_base/commands/velocity"/>
-  </node>
 
 </launch>

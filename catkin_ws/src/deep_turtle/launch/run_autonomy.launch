@@ -23,7 +23,7 @@
 
   <!-- Predict from saved model-->
   <node pkg="deep_turtle" type="predict_continous_node.py" name="neural_controller" output="screen">
-    <param name="model_name" value="wide_angle_1/wide_angle_1"/>
+    <!--<param name="model_name" value="rope1/rope1"/>-->
     <remap from="rgb_image" to="/cv_camera/image_raw"/>
   </node>
 

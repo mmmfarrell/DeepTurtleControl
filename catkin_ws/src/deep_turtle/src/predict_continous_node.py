@@ -22,6 +22,8 @@ from tensorflow.keras.models import model_from_json
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.resnet50 import preprocess_input
 
+from classical.segment_ropes import Segmenter
+
 class ContinuousNeuralController():
 
     def __init__(self):
@@ -31,9 +33,8 @@ class ContinuousNeuralController():
         self.bridge = CvBridge()
 
         print("b4 param")
-        #self.test_name = rospy.get_param("~model_name")
+        # self.test_name = rospy.get_param("~model_name")
         self.test_name = "wide_angle_1/wide_angle_1_model"
-        print(self.test_name)
 
         rospack = rospkg.RosPack()
         ws_root = rospack.get_path("deep_turtle").split('catkin_ws')[0]
@@ -41,6 +42,8 @@ class ContinuousNeuralController():
 
         self.model = self.load_model(model_dir)
         self.graph = tf.get_default_graph()
+
+        self.seg = Segmenter()
 
         self.last_command = 0.
 
@@ -79,6 +82,12 @@ class ContinuousNeuralController():
     def rgb_image_callback(self, rgb_msg):
         try:
           rgb_cv_image = self.bridge.imgmsg_to_cv2(rgb_msg, "bgr8")
+          # seg_img = rgb_cv_image.copy()
+          # seg_img = self.seg.segment_img(seg_img)
+
+          # cv2.imshow("raw img", rgb_cv_image)
+          # cv2.imshow("output", seg_img)
+          # cv2.waitKey(1)
           output = self.predict_from_cv_img(rgb_cv_image)
           self.publish_cmd(output)
           self.publish_smooth_cmd(output)
@@ -109,6 +118,7 @@ class ContinuousNeuralController():
         cmd_msg.angular.z = alpha * self.last_command + (1. - alpha) * predict_out
         self.last_command = cmd_msg.angular.z
         self._cmd_smooth_pub.publish(cmd_msg)
+        self.last_command = cmd_msg.angular.z
 
 
 if __name__ == '__main__':

@@ -4,8 +4,7 @@
   <node pkg="rosbag" type="play" name="rosbag_player" output="screen" args="/home/mmmfarrell/DeepTurtleControl/data/test.bag"/>
 
   <!-- Predict from saved model-->
-  <node pkg="deep_turtle" type="predict_continous_node.py" name="neural_controller" output="screen">
-    <param name="model_name" value="rope1/rope1"/>
+  <node pkg="deep_turtle" type="predict_classical.py" name="classical_cont" output="screen">
     <remap from="rgb_image" to="/camera/color/image_raw"/>
   </node>
 

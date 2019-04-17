@@ -6,3 +6,4 @@ data/*/*.json
 catkin_ws/src/deep_turtle/src/__pycache__/
 *.h5
 *.json
+*.pyc
