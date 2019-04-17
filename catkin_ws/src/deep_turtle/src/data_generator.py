@@ -5,15 +5,25 @@ import os
 
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.resnet50 import preprocess_input
+import cv2
 
 """
 Note this only works for rgb inputs and continuous omega outputs right now.
 """
 
-def get_and_preprocess_img(img_path, img_size):
-    img = image.load_img(img_path, target_size=img_size)
-    x = image.img_to_array(img)
-    x = np.expand_dims(x, axis=0)
+def get_and_preprocess_img(img_path, img_size, crop_box=[0,100,480,190]):
+    ''' Load and preprocess an image file
+
+    Parameters:
+        img_path: file path
+        img_size: width and height of image
+        crop_box: [x, y, width, height] of crop
+    '''
+    img = cv2.imread(img_path)
+    x, y, w, h = crop_box
+    img = img[y:y+h, x:x+w, :]
+    img = cv2.resize(img, tuple(img_size))
+    img = np.expand_dims(img, axis=0)
 
     # add gaussian noise to image something like this
     # sigma = 1.
@@ -21,9 +31,9 @@ def get_and_preprocess_img(img_path, img_size):
     # x = x + gauss
     # x = np.clip(x, 0., 255.)
 
-    x = preprocess_input(x)
+    img = preprocess_input(img)
 
-    return x
+    return img
 
 def get_and_preprocess_command(cmd_path, outputs):
     command = json.load(open(cmd_path))
@@ -57,12 +67,13 @@ class DataGenerator(keras.utils.Sequence):
     https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly
     '''
     def __init__(self, directory, channels='rgb', batch_size=32, img_size=(32,32),
-                 shuffle=True, outputs=1):
+                 crop_box=[0,0,480,640], shuffle=True, outputs=1):
         '''Initialization'''
         self.directory = directory
         self.channels = channels
         self.batch_size = batch_size
         self.img_size = img_size
+        self.crop_box = crop_box
         self.shuffle = shuffle
         self.outputs = outputs
 
@@ -108,11 +119,11 @@ class DataGenerator(keras.utils.Sequence):
             np.random.shuffle(self.sample_indeces)
 
     def __data_generation(self, batch_indexes):
-        '''Generates data containing batch_size samples''' 
+        '''Generates data containing batch_size samples'''
         # Initialization
         num_channels = len(self.channels)
 
-        X = np.empty((self.batch_size, self.img_size[0], self.img_size[1], num_channels))
+        X = np.empty((self.batch_size, self.img_size[1], self.img_size[0], num_channels))
         Y = np.empty((self.batch_size, self.outputs), dtype=float)
 
         # Generate data
@@ -121,7 +132,7 @@ class DataGenerator(keras.utils.Sequence):
             # Get preprocessed input
             assert(not self.use_depth), "Don't know how to preprocess depth yet"
             img_path = self.rgb_img_paths[img_idx]
-            img_input = get_and_preprocess_img(img_path, self.img_size)
+            img_input = get_and_preprocess_img(img_path, self.img_size, self.crop_box)
             X[i,] = img_input
 
             # Get output for the img

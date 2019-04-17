@@ -19,7 +19,7 @@ Note this only works for rgb inputs and continuous omega outputs right now.
 
 
 def get_model(img_size, outputs=1):
-    input_shape = (*img_size, 3)
+    input_shape = (img_size[1], img_size[0], 3)
     resnet_model = DenseNet201(weights=None, include_top=False,
                             input_shape=input_shape)
 
@@ -68,15 +68,19 @@ def save_model_and_weights(model_file):
 
 if __name__ == '__main__':
     # User Options
-    gen_params = {'img_size': (96, 128),
+    crop_box = [0, 100, 480, 190]
+    resize_scale = 3
+    img_size = [int(x/resize_scale) for x in crop_box[2:]]
+    gen_params = {'img_size': img_size,
+                  'crop_box': crop_box,
                   'batch_size': 10,
                   'channels': 'rgb',
                   'shuffle': True,
-                  'outputs': 3 } # outputs > 1 = omega_bins
+                  'outputs': 5 } # outputs > 1 = omega_bins
     load_model = False
     train_epochs = 25
     # train_folders = ['tower_rope_circle_0_3_vel', 'tower_rope_circle_2_0_3_vel']
-    train_folders = ['tower_rope_circle_2_0_3_vel']
+    train_folders = ['classical_bins_100']
     # train_folder = 'single_test'
     val_folder = 'tower_rope_circle_3_0_3_vel_val500'
 
@@ -124,8 +128,8 @@ if __name__ == '__main__':
         history = None
         history = model.fit_generator(generator=training_generator,
                                       validation_data=val_generator,
-                                      epochs=train_epochs, use_multiprocessing=True,
-                                      workers=4)
+                                      epochs=train_epochs, use_multiprocessing=False,
+                                      workers=1)
     except KeyboardInterrupt:
         '''If you exit with Ctrl + C the weights will be saved'''
         print("Got Keyboard Interrupt, saving model and closing")
