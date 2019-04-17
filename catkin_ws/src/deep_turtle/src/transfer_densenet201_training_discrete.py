@@ -68,12 +68,12 @@ def save_model_and_weights(model_file):
 
 if __name__ == '__main__':
     # User Options
-    crop_box = [0, 100, 480, 190]
+    crop_box = [0, 100, 640, 190]
     resize_scale = 3
     img_size = [int(x/resize_scale) for x in crop_box[2:]]
     gen_params = {'img_size': img_size,
                   'crop_box': crop_box,
-                  'batch_size': 10,
+                  'batch_size': 16,
                   'channels': 'rgb',
                   'shuffle': True,
                   'outputs': 5 } # outputs > 1 = omega_bins
