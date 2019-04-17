@@ -34,7 +34,7 @@ class ContinuousNeuralController():
 
         print("b4 param")
         # self.test_name = rospy.get_param("~model_name")
-        self.test_name = "wide_angle_1/wide_angle_1_model"
+        self.test_name = "class_bins_6_epochs/classical_bins_model"
 
         rospack = rospkg.RosPack()
         ws_root = rospack.get_path("deep_turtle").split('catkin_ws')[0]
@@ -106,11 +106,13 @@ class ContinuousNeuralController():
         with self.graph.as_default():
             out = self.model.predict(img)
 
+        # print("network out: ", out)
         bin_num = np.argmax(out)
 
         num_bins = 5
         bin_size = 2./num_bins
         cmd_out = bin_num * bin_size + bin_size/2. - 1.
+        # print("cmd out: ", cmd_out)
         return cmd_out
 
     def publish_cmd(self, predict_out):
