@@ -69,8 +69,8 @@ class ContinuousNeuralController():
         # self.current_record_idx += 1
 
     def compute_control(self, mid_x):
-        # scale = 2.0
-        scale = 5.0
+        scale = 4.0
+        # scale = 5.0
         #true_middle = 320
         # This is only because the camera isnt aligned with the robot, its tilted
         true_middle = 240
@@ -85,8 +85,12 @@ class ContinuousNeuralController():
 
 
     def publish_cmd(self, predict_out):
+        n_bins = 5
+        bin_width = 2.0/n_bins
+        discrete_out = int((predict_out)/bin_width)*bin_width
         cmd_msg = Twist()
-        cmd_msg.angular.z = predict_out
+        # cmd_msg.angular.z = predict_out
+        cmd_msg.angular.z = discrete_out
         self._cmd_pub.publish(cmd_msg)
 
     def publish_smooth_cmd(self, predict_out):

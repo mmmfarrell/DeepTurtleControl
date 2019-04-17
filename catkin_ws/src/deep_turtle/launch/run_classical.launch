@@ -18,8 +18,8 @@
     <param name="joy_omega_max" value="1."/>
     <param name="constant_vel" value="0.3"/>
     <remap from="turtle_cmd" to="/mobile_base/commands/velocity"/>
-    <!--<remap from="auto_cmd" to="/auto_cmd_raw"/>-->
-    <remap from="auto_cmd" to="/auto_cmd_smooth"/>
+    <remap from="auto_cmd" to="/auto_cmd_raw"/>
+    <!--<remap from="auto_cmd" to="/auto_cmd_smooth"/>-->
   </node>
 
   <!-- Predict from saved model-->

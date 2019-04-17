@@ -49,6 +49,8 @@ class Segmenter():
 
         img = cv2.rectangle(img, (0, 290), (640, 480), (0, 0, 0), -1)
         img = cv2.rectangle(img, (0, 0), (640, 100), (0, 0, 0), -1)
+        img = cv2.rectangle(img, (640, 100), (480, 290), (0, 0, 0), -1)
+
 
         # Hue Lightness Saturation
         img_hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)
