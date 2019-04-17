@@ -34,7 +34,7 @@ class ContinuousNeuralController():
 
         print("b4 param")
         # self.test_name = rospy.get_param("~model_name")
-        self.test_name = "rope1/rope1"
+        self.test_name = "wide_angle_1/wide_angle_1_model"
 
         rospack = rospkg.RosPack()
         ws_root = rospack.get_path("deep_turtle").split('catkin_ws')[0]
@@ -81,15 +81,15 @@ class ContinuousNeuralController():
     def rgb_image_callback(self, rgb_msg):
         try:
           rgb_cv_image = self.bridge.imgmsg_to_cv2(rgb_msg, "bgr8")
-          seg_img = rgb_cv_image.copy()
-          seg_img = self.seg.segment_img(seg_img)
+          # seg_img = rgb_cv_image.copy()
+          # seg_img = self.seg.segment_img(seg_img)
 
-          cv2.imshow("raw img", rgb_cv_image)
-          cv2.imshow("output", seg_img)
-          cv2.waitKey(1)
-          # output = self.predict_from_cv_img(rgb_cv_image)
-          # self.publish_cmd(output)
-          # self.publish_smooth_cmd(output)
+          # cv2.imshow("raw img", rgb_cv_image)
+          # cv2.imshow("output", seg_img)
+          # cv2.waitKey(1)
+          output = self.predict_from_cv_img(rgb_cv_image)
+          self.publish_cmd(output)
+          self.publish_smooth_cmd(output)
         except CvBridgeError as e:
           print(e)
           return
@@ -97,7 +97,7 @@ class ContinuousNeuralController():
         # self.current_record_idx += 1
 
     def predict_from_cv_img(self, img):
-        x = cv2.resize(img, (120, 120))
+        x = cv2.resize(img, (128, 96))
         x = np.expand_dims(x, axis=0)
         x = preprocess_input(x)
 
@@ -116,6 +116,7 @@ class ContinuousNeuralController():
         cmd_msg.linear.x = 0.3
         cmd_msg.angular.z = alpha * self.last_command + (1. - alpha) * predict_out
         self._cmd_smooth_pub.publish(cmd_msg)
+        self.last_command = cmd_msg.angular.z
 
 
 if __name__ == '__main__':

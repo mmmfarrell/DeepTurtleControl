@@ -4,7 +4,10 @@
   <include file="$(find turtlebot_bringup)/launch/minimal.launch"/>
 
   <!--Launch Realsense Camera-->
-  <include file="$(find realsense2_camera)/launch/rs_rgbd.launch"/>
+  <!--<include file="$(find realsense2_camera)/launch/rs_rgbd.launch"/>-->
+  <node pkg="cv_camera" type="cv_camera_node" name="cv_camera">
+    <param name="device_id" value="0"/>
+  </node>
 
   <!--Joy node for xbox 360-->
   <node pkg="joy" type="joy_node" name="joystick"/>
@@ -20,8 +23,8 @@
 
   <!-- Predict from saved model-->
   <node pkg="deep_turtle" type="predict_continous_node.py" name="neural_controller" output="screen">
-    <param name="model_name" value="rope1/rope1"/>
-    <remap from="rgb_image" to="/camera/color/image_raw"/>
+    <!--<param name="model_name" value="rope1/rope1"/>-->
+    <remap from="rgb_image" to="/cv_camera/image_raw"/>
   </node>
 
 
