@@ -35,7 +35,8 @@ class ContinuousNeuralController():
         print("b4 param")
         # self.test_name = rospy.get_param("~model_name")
         # self.test_name = "class_bins_6_epochs/classical_bins_model"
-        self.test_name = "class_bins_wide_crop7/classical_bins_model"
+        # self.test_name = "class_bins_wide_crop7/classical_bins_model"
+        self.test_name = "class_bins_w_human/classical_bins_model"
 
         rospack = rospkg.RosPack()
         ws_root = rospack.get_path("deep_turtle").split('catkin_ws')[0]
