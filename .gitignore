@@ -7,3 +7,7 @@ catkin_ws/src/deep_turtle/src/__pycache__/
 *.h5
 *.json
 *.pyc
+
+report/build/
+
+report/main\.synctex\.gz
