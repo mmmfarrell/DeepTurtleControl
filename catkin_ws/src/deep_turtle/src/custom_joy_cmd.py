@@ -51,7 +51,11 @@ class TurtleControl():
             self.cmd_msg.angular.z = self.joy_omega
         elif self.cmd_type == 1: # omega only command
             self.cmd_msg.linear.x = self.constant_vel
-            self.cmd_msg.angular.z = self.joy_omega
+            # self.cmd_msg.angular.z = self.joy_omega
+            n_bins = 5
+            bin_width = 2.0/n_bins
+            discrete_out = int((self.joy_omega)/bin_width)*bin_width
+            self.cmd_msg.angular.z = discrete_out
         elif self.cmd_type == 2: # auto command
             self.cmd_msg.linear.x = self.constant_vel
             # self.cmd_msg.linear.x = self.auto_cmd.linear.x

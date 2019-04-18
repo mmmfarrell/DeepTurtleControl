@@ -34,7 +34,8 @@ class ContinuousNeuralController():
 
         print("b4 param")
         # self.test_name = rospy.get_param("~model_name")
-        self.test_name = "class_bins_6_epochs/classical_bins_model"
+        # self.test_name = "class_bins_6_epochs/classical_bins_model"
+        self.test_name = "class_bins_wide_crop7/classical_bins_model"
 
         rospack = rospkg.RosPack()
         ws_root = rospack.get_path("deep_turtle").split('catkin_ws')[0]
@@ -53,6 +54,8 @@ class ContinuousNeuralController():
                 queue_size=10)
         self._cmd_smooth_pub = rospy.Publisher('auto_cmd_smooth', Twist,
                 queue_size=10)
+
+        rospy.loginfo("Neural Controller Ready!")
 
         rospy.spin()
 
@@ -92,7 +95,7 @@ class ContinuousNeuralController():
         # self.current_record_idx += 1
 
     def predict_from_cv_img(self, img):
-        crop_box = [0, 100, 480, 190]
+        crop_box = [0, 100, 640, 190]
         resize_scale = 3
         img_size = [int(x/resize_scale) for x in crop_box[2:]]
 
