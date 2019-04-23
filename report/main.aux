@@ -18,22 +18,38 @@
 \newlabel{sec:classical}{{II}{1}}
 \citation{ResNet}
 \citation{DenseNet}
+\@writefile{toc}{\contentsline {section}{\numberline {III}Network Approach}{2}}
+\newlabel{sec:network}{{III}{2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {III-A}Network architecture}{2}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Example image from the camera mounted on the TurtleBot.}}{2}}
 \newlabel{fig:raw_img}{{2}{2}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Cropped image from TurtleBot.}}{2}}
 \newlabel{fig:classical_crop}{{3}{2}}
-\@writefile{toc}{\contentsline {section}{\numberline {III}Network Approach}{2}}
-\newlabel{sec:network}{{III}{2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {III-A}Network architecture}{2}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces TurtleBot image after thresholding.}}{2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces TurtleBot image mask after thresholding.}}{2}}
 \newlabel{fig:classical_thresh}{{4}{2}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces TurtleBot image with only largest contours.}}{2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces TurtleBot image mask with only the largest contours.}}{2}}
 \newlabel{fig:classical_contours}{{5}{2}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces TurtleBot image with splines fit to largest contours.}}{2}}
-\newlabel{fig:classical_fit}{{6}{2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {III-B}Network Training}{2}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Example of a failure mode of the classical end-to-end control method.}}{2}}
-\newlabel{fig:classical_fail}{{7}{2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces TurtleBot image with splines fit to largest contours.}}{3}}
+\newlabel{fig:classical_fit}{{6}{3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Example of a failure mode of the classical end-to-end control method.}}{3}}
+\newlabel{fig:classical_fail}{{7}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {III-B}Network Training}{3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces DenseNet architecture}}{3}}
+\newlabel{fig:densenet}{{8}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {III-C}Continous Control}{3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Histogram of the omega commands for the training data used.}}{3}}
+\newlabel{fig:data_hist}{{9}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {III-D}Discretized Control}{3}}
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Results}{4}}
+\newlabel{sec:results}{{IV}{4}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Snapshot of the turtlebot successfully following a track using end-to-end deep learning-based control.}}{4}}
+\newlabel{fig:success_track}{{10}{4}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Top: Original image; bottom: Class saliency for rope on carpet data. Shows the gradient is highest near where the rope appears in the original image (top)}}{4}}
+\newlabel{fig:saliency1}{{11}{4}}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Class saliency on reflective concrete flooring.}}{4}}
+\newlabel{fig:saliency2}{{12}{4}}
+\@writefile{toc}{\contentsline {section}{\numberline {V}Future Work}{4}}
+\newlabel{sec:future_work}{{V}{4}}
 \bibstyle{IEEEtran}
 \bibdata{library}
 \bibcite{ramos2017detecting}{1}
@@ -49,10 +65,6 @@
 \bibcite{opencv_library}{11}
 \bibcite{ResNet}{12}
 \bibcite{DenseNet}{13}
-\@writefile{toc}{\contentsline {subsection}{\numberline {III-C}Continous Control}{3}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {III-D}Discretized Control}{3}}
-\@writefile{toc}{\contentsline {section}{\numberline {IV}Results}{3}}
-\newlabel{sec:results}{{IV}{3}}
-\@writefile{toc}{\contentsline {section}{\numberline {V}Conclusion}{3}}
-\newlabel{sec:conclusion}{{V}{3}}
-\@writefile{toc}{\contentsline {section}{References}{3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Class saliency on reflecitve concrete floor with mulptiple glare spots. Show that the network learned to filter out bright contours that do not correspond with rope.}}{5}}
+\newlabel{fig:saliency3}{{13}{5}}
+\@writefile{toc}{\contentsline {section}{References}{5}}

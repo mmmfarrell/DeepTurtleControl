@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2019.1.17)  23 APR 2019 15:10
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2019.1.17)  23 APR 2019 16:09
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -365,7 +365,11 @@ Package grfext Info: Graphics extension search list:
 (grfext)             \AppendGraphicsExtensions on input line 452.
  (/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
-)) (./sections/intro.tex <figures/turtlebot.png, id=1, 81.00262pt x 107.80275pt>
+)) (./sections/intro.tex
+
+LaTeX Warning: Reference `sec:conclusion' on page 1 undefined on input line 65.
+
+<figures/turtlebot.png, id=1, 81.00262pt x 107.80275pt>
 File: figures/turtlebot.png Graphic file (type png)
  <use figures/turtlebot.png>
 Package pdftex.def Info: figures/turtlebot.png used on input line 89.
@@ -384,55 +388,67 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
  <./figures/turtlebot.png>] <figures/raw_img.png, id=13, 481.8pt x 361.35pt>
 File: figures/raw_img.png Graphic file (type png)
  <use figures/raw_img.png>
-Package pdftex.def Info: figures/raw_img.png used on input line 26.
+Package pdftex.def Info: figures/raw_img.png used on input line 58.
 (pdftex.def)             Requested size: 240.8994pt x 180.67456pt.
  <figures/classical_crop.jpg, id=14, 361.35pt x 142.28156pt>
 File: figures/classical_crop.jpg Graphic file (type jpg)
  <use figures/classical_crop.jpg>
-Package pdftex.def Info: figures/classical_crop.jpg used on input line 33.
+Package pdftex.def Info: figures/classical_crop.jpg used on input line 65.
 (pdftex.def)             Requested size: 242.10324pt x 95.32814pt.
  <figures/classical_thresh.jpg, id=15, 481.8pt x 189.70876pt>
 File: figures/classical_thresh.jpg Graphic file (type jpg)
  <use figures/classical_thresh.jpg>
-Package pdftex.def Info: figures/classical_thresh.jpg used on input line 40.
+Package pdftex.def Info: figures/classical_thresh.jpg used on input line 72.
 (pdftex.def)             Requested size: 240.8994pt x 94.85414pt.
  <figures/classical_contours.jpg, id=16, 481.8pt x 189.70876pt>
 File: figures/classical_contours.jpg Graphic file (type jpg)
  <use figures/classical_contours.jpg>
-Package pdftex.def Info: figures/classical_contours.jpg used on input line 47.
+Package pdftex.def Info: figures/classical_contours.jpg used on input line 79.
 (pdftex.def)             Requested size: 240.8994pt x 94.85414pt.
  <figures/classical_fit.jpg, id=17, 481.8pt x 189.70876pt>
 File: figures/classical_fit.jpg Graphic file (type jpg)
  <use figures/classical_fit.jpg>
-Package pdftex.def Info: figures/classical_fit.jpg used on input line 54.
+Package pdftex.def Info: figures/classical_fit.jpg used on input line 86.
 (pdftex.def)             Requested size: 240.8994pt x 94.85414pt.
  <figures/classical_fail.jpg, id=18, 481.8pt x 189.70876pt>
 File: figures/classical_fail.jpg Graphic file (type jpg)
  <use figures/classical_fail.jpg>
-Package pdftex.def Info: figures/classical_fail.jpg used on input line 61.
+Package pdftex.def Info: figures/classical_fail.jpg used on input line 93.
 (pdftex.def)             Requested size: 240.8994pt x 94.85414pt.
-) (./sections/network.tex
-
-LaTeX Warning: Reference `fig:densenet' on page 2 undefined on input line 10.
-
-[2 <./figures/raw_img.png (PNG copy)> <./figures/classical_crop.jpg> <./figures/classical_thresh.jpg> <./figures/classical_contours.jpg> <./figures/classical_fit.jpg> <./figures/classical_fail.jpg>]
-
-LaTeX Warning: Reference `fig:data_hist' on page 3 undefined on input line 24.
-
-) (./sections/results.tex
-
-LaTeX Warning: Reference `fig:saliency1' on page 3 undefined on input line 9.
-
-
-LaTeX Warning: Reference `fig:saliency3' on page 3 undefined on input line 9.
-
-
-LaTeX Warning: Reference `fig:saliency3' on page 3 undefined on input line 9.
-
-) (./sections/conclusion.tex) (./main.bbl
+) (./sections/network.tex <figures/densenet.png, id=19, 715.67375pt x 507.8975pt>
+File: figures/densenet.png Graphic file (type png)
+ <use figures/densenet.png>
+Package pdftex.def Info: figures/densenet.png used on input line 11.
+(pdftex.def)             Requested size: 245.71811pt x 174.38008pt.
+ [2 <./figures/raw_img.png (PNG copy)> <./figures/classical_crop.jpg> <./figures/classical_thresh.jpg> <./figures/classical_contours.jpg>] <figures/data_histogram.png, id=24, 462.528pt x 346.896pt>
+File: figures/data_histogram.png Graphic file (type png)
+ <use figures/data_histogram.png>
+Package pdftex.def Info: figures/data_histogram.png used on input line 31.
+(pdftex.def)             Requested size: 245.71811pt x 184.28804pt.
+ [3 <./figures/classical_fit.jpg> <./figures/classical_fail.jpg> <./figures/densenet.png (PNG copy)> <./figures/data_histogram.png>]) (./sections/results.tex <figures/success_track.jpg, id=29, 1927.2pt x 1084.05pt>
+File: figures/success_track.jpg Graphic file (type jpg)
+ <use figures/success_track.jpg>
+Package pdftex.def Info: figures/success_track.jpg used on input line 8.
+(pdftex.def)             Requested size: 245.71811pt x 138.20213pt.
+ <figures/saliency1.png, id=30, 213.79875pt x 126.4725pt>
+File: figures/saliency1.png Graphic file (type png)
+ <use figures/saliency1.png>
+Package pdftex.def Info: figures/saliency1.png used on input line 18.
+(pdftex.def)             Requested size: 245.71811pt x 145.35345pt.
+ <figures/saliency2.png, id=31, 213.79875pt x 126.4725pt>
+File: figures/saliency2.png Graphic file (type png)
+ <use figures/saliency2.png>
+Package pdftex.def Info: figures/saliency2.png used on input line 24.
+(pdftex.def)             Requested size: 245.71811pt x 145.35345pt.
+ <figures/saliency3.png, id=32, 213.79875pt x 126.4725pt>
+File: figures/saliency3.png Graphic file (type png)
+ <use figures/saliency3.png>
+Package pdftex.def Info: figures/saliency3.png used on input line 30.
+(pdftex.def)             Requested size: 245.71811pt x 145.35345pt.
+) (./sections/future_work.tex [4 <./figures/success_track.jpg> <./figures/saliency1.png> <./figures/saliency2.png>]) (./main.bbl
 Missing character: There is no Â in font ptmr7t!
 Missing character: There is no ® in font ptmr7t!
- [3])
+)
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -444,26 +460,24 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the US letter (8.5in X 11in) paper size.
 
-[4
-
-] (./main.aux)
+[5 <./figures/saliency3.png>] (./main.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 4752 strings out of 493029
- 66654 string characters out of 6136234
- 148379 words of memory out of 5000000
- 8164 multiletter control sequences out of 15000+600000
+ 4785 strings out of 493029
+ 67444 string characters out of 6136234
+ 146431 words of memory out of 5000000
+ 8191 multiletter control sequences out of 15000+600000
  40078 words of font info for 84 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  41i,9n,35p,941b,340s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (4 pages, 832965 bytes).
+Output written on main.pdf (5 pages, 1826027 bytes).
 PDF statistics:
- 47 PDF objects out of 1000 (max. 8388607)
- 27 compressed objects within 1 object stream
+ 57 PDF objects out of 1000 (max. 8388607)
+ 29 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 36 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 66 words of extra memory for PDF output out of 10000 (max. 10000000)
 
