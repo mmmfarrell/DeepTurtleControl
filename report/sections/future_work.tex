@@ -1,8 +1,12 @@
 % !TEX root=../main.tex
 \section{Future Work}
 \label{sec:future_work}
-Although the control was sufficient to navigate a simple track multiple times, there is definitely room for improvement. One main disadvantage of our current method is that the discretized cotrol is somewhat jerky and it could potentially limite the robots ability to make sharper turns on more difficult tracks if the avaiable discrete values were insufficient to make the turn. Some possible improvements to overcome this could be to use more bins to better approximate continuous control, or possibly to better collect and augment the data used to train the continous control output to see if we can produce effective control without discretization.
+Although the control was sufficient to navigate a simple track multiple times,
+there is definitely room for improvement. One main disadvantage of our current
+method is that the discretized control is somewhat jerky and it could
+potentially limit the robot's ability to make sharper turns on more difficult
+tracks if the available discrete values were insufficient to make the turn. Some possible improvements to overcome this could be to use more bins to better approximate continuous control, or possibly to better collect and augment the data used to train the continous control output to see if we can produce effective control without discretization.
 
 We would also like to find ways to extend the results of this project beyond the contrived example of following rope lanes to something with real-world usefulness. This could include training the network to use more natural features to navigate such as hallways, aisles, existing tile markings, or sidewalks. This would allow the network to leverage it's full potential to interpret high level features rather than just simple lines. Another extension that could improve the usefulness of this control method could be to integrate the autonomous control with SLAM (simulataneous localization and mapping) or some other mapping algorithm to not only navigate the real world, but also to collect data about the environment along the way.
 
-This turtlebot control project proved to be a useful opportunity for us to apply deep learning and computer vision principles to a non-trivial problem and to gain some real-world experience implementing these technologies on a hardware platform.
+This TurtleBot control project proved to be a useful opportunity for us to apply deep learning and computer vision principles to a non-trivial problem and to gain some real-world experience implementing these technologies on a hardware platform.

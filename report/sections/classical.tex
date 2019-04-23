@@ -44,12 +44,12 @@ appear like Figure~\ref{fig:classical_fail} where there is no clear direction
 for the robot to follow.
 
 After rope detection and classification, we must compute a steering command. To
-compute the desired steering command, we first fit a second order spline to each
+compute the desired steering command, we first fit a second-order spline to each
 of the detected ropes as seen in Figure~\ref{fig:classical_fit}. This spline
 fitting serves to smooth out the desired path to follow. We evaluate each spline
 at a given height in the image, near the top of the cropped image. We then
 average these spline evaluations to get an approximate for our location between
-the ropes. We then multiply the error between this average of these spline
+the ropes. We then multiply the error between the average of these spline
 evaluations and the center of the image by a proportional gain to get the
 desired angular velocity of the TurtleBot.
 
