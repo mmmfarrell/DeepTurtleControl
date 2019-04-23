@@ -81,17 +81,24 @@ if __name__ == '__main__':
     true_bin = 0
     random_start_img = np.random.normal(size=(1, 63, 213, 3))
     cv2.imshow("start", random_start_img[0, :])
-    cv2.waitKey(0)
+    cv2.waitKey(3)
 
     # Evaluate the gradient of the classification w.r.t. input. Evaluate at
     # current input image
     input_tensor = model.input
-    output_tensor = model.output[:, true_bin]
+    # output_tensor = model.output[:, true_bin]
+    output_tensor = model.output
     gradients = backend.gradients(output_tensor, input_tensor)
 
-    scale = 1.
-    num_iterations = 100
+    scale = 100.
+    num_iterations = 10000
     ideal_img = random_start_img.copy()
+
+    # Load example img
+    img_path = '/home/mmmfarrell/DeepTurtleControl/data/classical_bins/00000_rgb.jpg'
+    img = cv2.imread(img_path)
+    input_img = get_preprocessed_input(img)
+    ideal_img = input_img.copy()
 
     for i in range(num_iterations):
         # calculate gradients
@@ -99,7 +106,9 @@ if __name__ == '__main__':
 
         # Take a step (gradient ascent)
         ideal_img += scale * evaluated_gradients[0]
+        print(np.sum(evaluated_gradients[0]))
         cv2.imshow("ascending img", ideal_img[0, :])
+        cv2.waitKey(3)
 
     # Normalize the gradients so we can see them
     # abs_grad = np.abs(evaluated_gradients[0])

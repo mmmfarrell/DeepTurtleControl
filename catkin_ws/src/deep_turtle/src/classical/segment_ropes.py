@@ -36,7 +36,7 @@ class Segmenter():
             cv2.circle(img, (x_fit[i], y_fit[i]), 2, (0, 0, 255), -1)
 
         pt = self.get_middle_point(f, 160)
-        cv2.circle(img, pt, 10, (0, 255, 0), -1)
+        # cv2.circle(img, pt, 5, (255, 0, 0), -1)
 
     def get_middle_point(self, f, y_pt):
         y_middle = y_pt
@@ -47,25 +47,32 @@ class Segmenter():
 
     def segment_img(self, img):
 
+        cv2.imshow("raw", img)
         img = cv2.rectangle(img, (0, 290), (640, 480), (0, 0, 0), -1)
         img = cv2.rectangle(img, (0, 0), (640, 100), (0, 0, 0), -1)
         img = cv2.rectangle(img, (640, 100), (480, 290), (0, 0, 0), -1)
+        cv2.imshow("cropped", img[101:290, 0:480])
 
 
         # Hue Lightness Saturation
         img_hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)
 
-        margin = 1
+        margin = 15
         lower_white = np.array([0, 255 - margin, 0], dtype=np.uint8)
         upper_white = np.array([255, 255, 255], dtype=np.uint8)
 
         mask = cv2.inRange(img_hls, lower_white, upper_white)
-        # cv2.imshow("mask", mask)
+        # cv2.imshow("mask", mask[101:290, 0:480])
+        # cv2.imwrite("./mask.jpg", mask[101:290, 0:480])
 
         i, contours, heirarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL,
                 cv2.CHAIN_APPROX_SIMPLE)
 
         cont_sorted = sorted(contours, key=cv2.contourArea, reverse=True)[:2]
+        mask = np.zeros_like(mask)
+        for idx in range(len(cont_sorted) - 1, -1, -1):
+            cv2.drawContours(mask, cont_sorted, idx, 255, -1)
+        cv2.imwrite("./mask.jpg", mask[101:290, 0:480])
 
         y_pt = img.shape[0] / 3
         #y_pt = img.shape[0] / 2
@@ -102,10 +109,10 @@ class Segmenter():
             # cont_thresh = 2000.
             cont_thresh = 500.
             if cont_area > cont_thresh:
-                if right_lane:
-                    cv2.circle(img, (490, 385), 20, (255, 0, 0), -1)
-                if left_lane:
-                    cv2.circle(img, (75, 385), 20, (255, 0, 0), -1)
+                # if right_lane:
+                    # cv2.circle(img, (490, 385), 20, (255, 0, 0), -1)
+                # if left_lane:
+                    # cv2.circle(img, (75, 385), 20, (255, 0, 0), -1)
                 poly = self.get_poly_from_mask(mask)
                 self.draw_poly(poly, img)
 
@@ -116,11 +123,13 @@ class Segmenter():
 
         avg_middle_x = (middles['left'][0] + middles['right'][0]) / 2
         avg_middle_y = (middles['left'][1] + middles['right'][1]) / 2
-        cv2.circle(img, (avg_middle_x, avg_middle_y), 10, (0, 0, 255), -1)
+        # cv2.circle(img, (avg_middle_x, avg_middle_y), 5, (0, 0, 255), -1)
+        # cv2.circle(img, (240, avg_middle_y), 5, (0, 255, 0), -1)
 
         # Draw left and right lane detection
         img = cv2.rectangle(img, (0, 100), (240, 290), (0, 0, 255), 3)
-        img = cv2.rectangle(img, (640, 100), (240, 290), (0, 0, 255), 3)
+        img = cv2.rectangle(img, (480, 100), (240, 290), (0, 0, 255), 3)
+        cv2.imwrite("./mask.jpg", img[101:290, 0:480])
 
         return img, avg_middle_x
 
@@ -128,12 +137,14 @@ class Segmenter():
 if __name__ == '__main__':
     seg = Segmenter()
 
-    img_files = ["./example.jpg", "./example_hard.jpg"]
+    # img_files = ["./example.jpg", "./example_hard.jpg"]
     # img_files = ["./example.jpg"]
+    img_files = ["./straight2.jpg"]
+    # img_files = ["./example_hard.jpg"]
     for img_file in img_files:
         img = cv2.imread(img_file)
-        seg_img = seg.segment_img(img)
+        seg_img, _ = seg.segment_img(img)
 
-        cv2.imshow("img", img)
-        cv2.imshow("segmented", seg_img)
+        # cv2.imshow("img", img)
+        # cv2.imshow("segmented", seg_img)
         cv2.waitKey(0)

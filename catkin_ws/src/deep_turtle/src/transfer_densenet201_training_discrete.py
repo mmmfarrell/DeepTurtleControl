@@ -77,10 +77,10 @@ if __name__ == '__main__':
                   'channels': 'rgb',
                   'shuffle': True,
                   'outputs': 5 } # outputs > 1 = omega_bins
-    load_model = False
+    load_model = True
     train_epochs = 25
     # train_folders = ['tower_rope_circle_0_3_vel', 'tower_rope_circle_2_0_3_vel']
-    train_folders = ['classical_bins']
+    train_folders = ['michael_bins', 'michael_bins_hard', 'michael_bins_outside']
     # train_folder = 'single_test'
     val_folder = 'classical_bins_100'
 
@@ -91,7 +91,8 @@ if __name__ == '__main__':
     ws_root = os.getcwd().split('catkin_ws')[0]
 
     # Load model or make a directory for the model
-    test_name = '&'.join(train_folders)
+    # test_name = '&'.join(train_folders)
+    test_name = 'classical_bins'
     model_dir_path = os.path.join(ws_root, 'saved_models', test_name)
     model_name = test_name + '_model'
     model_file = os.path.join(model_dir_path, model_name)
