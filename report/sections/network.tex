@@ -7,12 +7,18 @@ This section describes the architecture and training methods used to train a con
 \subsection{Network architecture}
 We experimented with multiple architectures, including a simple convolutional neural network (CNN), and a ResNet~\cite{ResNet}, but we eventually decided to use the DenseNet as our base architecture~\cite{DenseNet}.
 
-The Densenet is an network architecture with densely connect convolutional blocks, as seen in Figure~\ref{fig:densenet}. The DenseNet architecture is unique because of the densely connected skip connections across multiple convolutional blocks, which allows the architecture to re-use features across mutliple blocks. Accordingly, it has achieved better results on benchmarks such as ImageNet with a smaller memory footprint.
+\begin{figure}[hbt]
+  \includegraphics[width=\columnwidth]{figures/densenet}
+  \caption{DenseNet architecture}
+  \label{fig:densenet}
+\end{figure}
+
+The Densenet is an network architecture with densely connect convolutional blocks, as seen in Figure~\ref{fig:densenet}. The DenseNet architecture is unique because of the densely connected skip connections across multiple convolutional blocks, which allows the architecture to re-use features throughout the network. Accordingly, it has achieved better results on benchmarks such as ImageNet with a smaller memory footprint.
 
 We used a pre-trained model for the DenseNet convolutional blocks, and added three linear layers with dropout to train the turtlebot control using the DenseNet features.
 
 \subsection{Network Training}
-We used supervised "imitation" learning to train the control network. We collected data by driving the turtlebot around multiple tracks on different ground surfaces and matched RGB camera images to angular velocity command outputs. We initially used the classical vision control method to gather data on a single track, then diversivied the data by manually driving the turtlebot around other varied tracks.
+We used supervised "imitation" learning to train the control network. We collected data by driving the turtlebot around multiple tracks on different ground surfaces and matched RGB camera images to angular velocity command outputs. We initially used the classical vision control method to gather data on a single track, then diversivied the data by manually driving the turtlebot around other varied tracks and surfaces.
 
 Using the image-command pairs, we trained the neural network to predict the appropriate command for each input image. We trained the network on about 7 epochs of 15,000 images.
 
@@ -21,7 +27,13 @@ Ideally, we would like the network to be able to predict a continous control out
 
 After multiple attempts at training the network to predict a continouous output, we were able to get some success, but the turtlebot had a hard time making sharper turns and would often drive straight off the course instead of making the turns. In general, the control was underactuated.
 
-We assume that the issue was a data problem, so we plotted a rough distribution of the data, as seen in Figure~\ref{fig:data_hist}. The data is centered about mean and has a larger proportion of commands close to zero than it does further away. It seems as though the network was able to quickly decrease the loss by driving the control close to zero, causing the turtlebot to default to slower angular rates. The problem was then magnified because the turtlebot would fail to turn sharply and place itself in a situation that it had not seen before.
+\begin{figure}[hbt]
+  \includegraphics[width=\columnwidth]{figures/data_histogram}
+  \caption{Histogram of the omega commands for the training data used.}
+  \label{fig:data_hist}
+\end{figure}
+
+We assume that the issue was a data problem, so we plotted a rough distribution of the data, as seen in Figure~\ref{fig:data_hist}. The data is centered about mean and has a larger proportion of commands close to zero than it does further away. It seems as though the network was able to quickly decrease the loss by driving the control close to zero, causing the turtlebot to default to slower angular rates. The problem was then magnified because the turtlebot would fail to turn sharply and place itself in a situation that it had not seen before and could not recover from.
 
 To overcome this issue, we decided to try using an architecture with discrete outputs and treat it as a classification problem. Some other potential solutions to our problems could have included augmenting the data to include more off-center scenarios or to gather data with more variety, including the corner cases where the turtlebot needs to recover from poor control or poor initial conditions.
 
