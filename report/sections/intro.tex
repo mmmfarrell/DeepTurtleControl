@@ -6,32 +6,87 @@
 % Make sure to explain why it's important/relevant/interesting.
 % Briefly summarize relevant papers that you build your project on.
 
-Here's a really cool introduction
+Over the past decade, the deep learning revolution has quickly made its way into
+many applications and products. During the same time frame, the self-driving car
+has rapidly become the focus of many companies ranging from start-ups to tech
+giants. It is no mistake that these two movements have gained traction at the
+same time. State-of-the-art approaches to the self-driving car problem depend on
+a fusion on classical methods with deep
+learning~\cite{ramos2017detecting} to create a
+reliable solution that can be trusted in a variety of environments.
 
-Nvidia PilotNet.~\cite{bojarski2016end}.
+Though far out of reach with current research, some people believe that the
+future of self-driving cars will depend solely on computer vision combined with deep
+learning~\cite{huval2015empirical}. This approach attempts to mimic the human
+driver, the only example we have to date of a dependable driver in almost any
+scenario. As humans, we depend almost entirely on what we perceive with our two
+eyes to control the vehicle. This examples leads us to believe that maybe one
+day it will be possible to similarly control a vehicle with an end-to-end
+approach, with vision as the input and vehicle control as the output.
 
-Nvidia PilotNet. Finding the salient objects that contribute to the output.
-Shows that it learned to look at lane lines, sides of roads, cars parked on the
-side, etc.~\cite{bojarski2017explaining}.
+In the past few years, this simplified approach to the self-driving car problem
+has gained traction with hobbyists as well as professionals. NVIDIA's PilotNet
+demonstrated the ability of modern convolutional neural networks (CNNs) to map
+raw pixels from a single front-facing camera directly to steering
+commands~\cite{bojarski2016end}. NVIDIA was also able to show that PilotNet's steering
+command output was affected most by visual cues in the images that human drivers
+also react to including lane lines, parked cars, and unexpected
+obstacles~\cite{bojarski2017explaining}. Hobbyists have applied a similar
+approach to create autonomous, remote control
+cars~\cite{bechtel2018deeppicar}~\cite{donkeycar}.
 
-End to end for deep visuomotor policies. Learn visuomotor polies to control the
-torque of a robot arm to do basic tasks like place a hanger, pick up objects.~\cite{levine2016end}.
+The principle of end-to-end control has been seen in a variety of applications.
+For deep visuomotor policies, such as a robot arm picking up an object, it has
+even been shown that training the perception and control systems jointly
+end-to-end provides better performance than training each component
+separately~\cite{levine2016end}.
 
-Learn spatiotemporal features. Used in video such as action recognition.~\cite{tran2015learning}
+In this work, we develop and test an end-to-end control method for a TurtleBot
+robot (Figure \ref{fig:turtlebot_pic}) following a course created from a pair of
+ropes. To simplify the problem, we command a constant desired linear velocity
+for the Turtlebot and focus only on controlling the steering.
+As in NVIDIA's PilotNet, our method uses
+individual camera images to predict the steering command for the robot. Other
+similar work has shown that recurrent neural networks, such as those using an
+LSTM~\cite{xingjian2015convolutional}, have the ability to learn both the visual
+and dynamic temporal dependencies of a self-driving vehicle~\cite{eraqi2017end}.
+Additionaly, methods that use a video stream as the input as opposed to
+still-frame images have shown the ability to learn spatiotemporal
+features~\cite{tran2015learning}. Though these approaches may be great, natural
+extensions of this work, we describe a basic, easy-to-implement method that
+extends to a variety of ground robot tasks.
 
-LSTM for RNN.~\cite{xingjian2015convolutional}
+This paper describes our approach in the following manner. Section
+\ref{sec:classical} describes an end-to-end control formulation using classical
+methods of image processsing and control. Section \ref{sec:network} describes an
+end-to-end control formulation using a deep neural network.
+Section~\ref{sec:results} describes the results of our experiments including the
+advantages and disadvantages of the classical and neural network based
+approaches. Section~\ref{sec:conclusion} provides some concluding remarks and
+some suggestions for future work.
 
-Attempt to learn both visual and dynamic temporal dependencies of driving with
-an RNN. Trained on comma.ai dataset. C-LSTM outperforms CNN.~\cite{eraqi2017end}
+%Nvidia PilotNet. Finding the salient objects that contribute to the output.
+%Shows that it learned to look at lane lines, sides of roads, cars parked on the
+%side, etc.~\cite{bojarski2017explaining}.
 
-Small scale version of Nvidia's PilotNet running on a Raspberry Pi.~\cite{bechtel2018deeppicar}
+%End to end for deep visuomotor policies. Learn visuomotor polies to control the
+%torque of a robot arm to do basic tasks like place a hanger, pick up objects.~\cite{levine2016end}.
 
-Donkeycar also.~\cite{donkeycar}.
+%Learn spatiotemporal features. Used in video such as action recognition.~\cite{tran2015learning}
+
+%LSTM for RNN.~\cite{xingjian2015convolutional}
+
+%Attempt to learn both visual and dynamic temporal dependencies of driving with
+%an RNN. Trained on comma.ai dataset. C-LSTM outperforms CNN.~\cite{eraqi2017end}
+
+%Small scale version of Nvidia's PilotNet running on a Raspberry Pi.~\cite{bechtel2018deeppicar}
+
+%Donkeycar also.~\cite{donkeycar}.
 
 
 \begin{figure}
   \centering
   \includegraphics[scale=1.5]{figures/turtlebot.png}
-  \caption{Turtlebot robot used in experiments.}
-  \label{f:turtlebot_pic}
+  \caption{TurtleBot robot used in experiments.}
+  \label{fig:turtlebot_pic}
 \end{figure}
